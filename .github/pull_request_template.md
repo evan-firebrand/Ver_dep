@@ -89,6 +89,20 @@ None / [ADR-NNNN](docs/adr/NNNN-title.md)
 >
 > If none, write "No open questions."
 
+## Drift Risk
+
+> Files you changed may be listed as touchpoints in existing ADRs (`docs/adr/`).
+> For each affected ADR, confirm its invariants still hold or update them.
+> CI will flag file-level overlaps, but only you can detect _semantic_ drift
+> (e.g., you changed how tests work but an ADR still describes the old behavior).
+>
+> | ADR | Touchpoint Changed | Status |
+> |-----|--------------------|--------|
+> | [0001](docs/adr/0001-initial-stack-and-agentic-workflow.md) | `example.ts` | ✅ Verified — invariants still hold |
+>
+> If no ADRs have touchpoints matching your changed files, write
+> "No drift risk — no ADR touchpoints affected."
+
 ## Session Hygiene
 
 > - [ ] I ran `npm run lint` and it passed

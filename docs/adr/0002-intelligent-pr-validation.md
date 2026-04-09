@@ -28,6 +28,8 @@ Add two new jobs to the CI workflow, running in parallel with lint/typecheck/bui
    - Deployment/tooling config changes → verification reminders
    - CI pipeline or agent contract changes → ADR trigger reminder
    - PR size guardrails: warns if >500 lines changed or >15 files touched
+   - New source files without tests → co-location reminder (added by ADR-0003)
+   - ADR drift detection → flags when changed files match ADR touchpoints (added by ADR-0004)
 
 Each job posts its own sticky comment with a distinct header so comments don't overwrite each other.
 

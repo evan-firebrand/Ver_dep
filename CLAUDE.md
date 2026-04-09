@@ -70,7 +70,7 @@ The CI workflow posts three sticky comments on every PR:
 
 1. **CI Summary** — lint, typecheck, format, test, and build results.
 2. **PR Validation** — checks that agent PRs have properly filled-out reflection sections and no Golden Rule violations. Hard fail.
-3. **Change Reminders** — advisory notes about files you changed (e.g., "new dependency detected — ADR needed?", "large PR — consider splitting"). Not blocking.
+3. **Change Reminders** — advisory notes about files you changed (e.g., "new dependency detected — ADR needed?", "large PR — consider splitting", "ADR drift risk — changed files match touchpoints"). Not blocking.
 
 - **When a comment addresses "Hey Claude —"**, treat the failures listed as direct instructions to fix.
 - Fix the issues, commit, and push. Comments auto-update on each push.
@@ -84,10 +84,11 @@ When you create a PR:
 3. In **Task Fidelity**: quote the original task verbatim under "Task as Given" — do not paraphrase. Describe what you built under "Task as Delivered". Be honest about the delta.
 4. In **Deferred / Declined**: list anything you considered but chose not to do. "Nothing deferred" is valid but think first.
 5. In **Confidence**: pick a rating. If 🟡 or 🔴, you MUST list specific uncertain areas with file paths.
-6. Check **Session Hygiene** boxes only if you actually performed each step.
-7. In **Suggested Squash Commit Message**: write a copy-pasteable commit message for the repo owner. Title line under 72 chars with PR number, blank line, bulleted body summarizing the changes.
-8. After creating the PR, **subscribe to PR activity** so you receive review comments and CI results. You are responsible for responding to review comments on PRs you create. Do not create a PR and walk away.
-9. **Never merge your own PR.** Only the repo owner squashes and merges to `main`.
+6. In **Drift Risk**: check if files you changed appear as touchpoints in any ADR (`docs/adr/`). For each affected ADR, verify its invariants still hold and note whether you updated or confirmed it. CI will flag touchpoint overlaps automatically, but semantic drift (e.g., an ADR describing behavior you changed) requires your judgment.
+7. Check **Session Hygiene** boxes only if you actually performed each step.
+8. In **Suggested Squash Commit Message**: write a copy-pasteable commit message for the repo owner. Title line under 72 chars with PR number, blank line, bulleted body summarizing the changes.
+9. After creating the PR, **subscribe to PR activity** so you receive review comments and CI results. You are responsible for responding to review comments on PRs you create. Do not create a PR and walk away.
+10. **Never merge your own PR.** Only the repo owner squashes and merges to `main`.
 
 ## PR Takeover
 

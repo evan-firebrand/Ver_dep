@@ -108,3 +108,4 @@ Playwright for E2E/async Server Component testing is deferred until there are ac
 
 - [ADR-0001](./0001-initial-stack-and-agentic-workflow.md) — established CI pipeline this ADR extends
 - [ADR-0002](./0002-intelligent-pr-validation.md) — established change-reminders job this ADR extends
+- [ADR-0004](./0004-drift-detection-across-interlinked-documents.md) — drift detection system motivated by this ADR's cross-system impact

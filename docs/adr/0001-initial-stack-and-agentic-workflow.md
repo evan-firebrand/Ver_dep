@@ -85,3 +85,4 @@ This is a greenfield project deployed to Vercel. The repo needs to support auton
 
 - [ADR-0002](./0002-intelligent-pr-validation.md) — extends CI with PR validation and change reminders
 - [ADR-0003](./0003-testing-framework-and-agent-testing-rules.md) — adds testing to CI and agent contract
+- [ADR-0004](./0004-drift-detection-across-interlinked-documents.md) — drift detection across ADR touchpoints
