@@ -84,3 +84,356 @@ jobs:
       - name: Fail if checks failed
         if: steps.summary.outputs.failed == 'true'
         run: exit 1
+
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check golden rule violations
+        id: golden-rules
+        run: |
+          violations=""
+
+          # Get changed/added files relative to base branch
+          changed_files=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD 2>/dev/null || echo "")
+
+          # Rule: No vercel.json
+          if echo "$changed_files" | grep -qx "vercel.json"; then
+            violations="${violations}vercel.json must not exist — use \`vercel.ts\` instead\n"
+          fi
+
+          # Rule: npm only (no other lockfiles)
+          for lockfile in yarn.lock pnpm-lock.yaml bun.lock; do
+            if echo "$changed_files" | grep -qx "$lockfile"; then
+              violations="${violations}npm only — do not add \`${lockfile}\`\n"
+            fi
+          done
+
+          # Rule: No .env files (allow .env.example and *.local)
+          if echo "$changed_files" | grep -E '^\.(env)$|^\.(env)\.[^.]+$' | grep -vE '\.example$|\.local$'; then
+            violations="${violations}No secrets in the repo — \`.env\` files must not be committed\n"
+          fi
+
+          # Rule: No Edge runtime in added lines
+          diff_content=$(git diff --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' 2>/dev/null || echo "")
+          if echo "$diff_content" | grep -E '^\+.*runtime.*["\x27]edge["\x27]' | grep -v '^\+\+\+' > /dev/null 2>&1; then
+            violations="${violations}No Edge runtime — use Fluid Compute (Node.js) instead\n"
+          fi
+
+          echo "violations<<EOF" >> "$GITHUB_OUTPUT"
+          echo -e "$violations" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Validate PR description and compose results
+        id: validate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const body = pr.body || '';
+            const author = pr.user.login;
+            const goldenViolations = `${{ steps.golden-rules.outputs.violations }}`.trim();
+
+            // --- Human vs. Agent detection ---
+            const skipAuthors = ['dependabot[bot]', 'renovate[bot]'];
+            const isBot = skipAuthors.includes(author);
+            const hasAgentReflection = body.includes('## Task Fidelity');
+
+            // Strip HTML comments for content checks
+            const stripped = body.replace(/<!--[\s\S]*?-->/g, '');
+            const reflectionUncommented = stripped.includes('## Task Fidelity');
+
+            let descriptionErrors = [];
+            let descriptionSkipped = false;
+
+            if (isBot) {
+              descriptionSkipped = true;
+            } else if (!hasAgentReflection) {
+              // Human PR — no agent reflection present at all
+              descriptionSkipped = true;
+            } else {
+              // Agent PR — validate
+
+              // Check 1: Reflection sections are uncommented
+              if (!reflectionUncommented) {
+                descriptionErrors.push(
+                  'Agent Reflection sections are still inside HTML comments — uncomment them'
+                );
+              }
+
+              if (reflectionUncommented) {
+                // Check 2: Required headings exist
+                const requiredHeadings = [
+                  'Task Fidelity',
+                  'Task as Given',
+                  'Task as Delivered',
+                  'Delta',
+                  'Deferred',
+                  'Confidence',
+                  'Suggested Squash Commit Message',
+                ];
+                for (const heading of requiredHeadings) {
+                  const pattern = new RegExp(`^#{2,3}\\s+.*${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'm');
+                  if (!pattern.test(stripped)) {
+                    descriptionErrors.push(`Missing required heading: "${heading}"`);
+                  }
+                }
+
+                // Check 3: Task as Given has substantive content
+                const taskAsGivenMatch = stripped.match(
+                  /###\s+Task as Given\s*\n([\s\S]*?)(?=\n##|\n###|$)/
+                );
+                if (taskAsGivenMatch) {
+                  const section = taskAsGivenMatch[1];
+                  const quoteLines = section
+                    .split('\n')
+                    .filter((l) => l.startsWith('>'))
+                    .map((l) => l.replace(/^>\s*/, '').trim())
+                    .filter((l) => l.length > 10 && !l.includes('Paste or summarize'));
+                  if (quoteLines.length === 0) {
+                    descriptionErrors.push(
+                      '"Task as Given" must contain a substantive blockquote (not placeholder text)'
+                    );
+                  }
+                }
+
+                // Check 4: Confidence rating present
+                const hasRating =
+                  stripped.includes('Ship it') ||
+                  stripped.includes('Verify') ||
+                  stripped.includes('Caution');
+                if (!hasRating) {
+                  descriptionErrors.push(
+                    'Confidence section must contain one of: "Ship it", "Verify", or "Caution"'
+                  );
+                }
+
+                // Check 5: Summary has real content
+                const summaryMatch = stripped.match(
+                  /##\s+Summary\s*\n([\s\S]*?)(?=\n##)/
+                );
+                if (summaryMatch) {
+                  const summaryText = summaryMatch[1]
+                    .replace(/<!--[\s\S]*?-->/g, '')
+                    .trim();
+                  if (
+                    summaryText.length < 20 ||
+                    summaryText.includes('What changed, and why?')
+                  ) {
+                    descriptionErrors.push(
+                      'Summary must have real content (>20 chars, not placeholder)'
+                    );
+                  }
+                } else {
+                  descriptionErrors.push('Summary section is missing or empty');
+                }
+
+                // Check 6: Changes has real bullets
+                const changesMatch = stripped.match(
+                  /##\s+Changes\s*\n([\s\S]*?)(?=\n##)/
+                );
+                if (changesMatch) {
+                  const bullets = changesMatch[1]
+                    .split('\n')
+                    .filter((l) => /^- .{3,}/.test(l.trim()));
+                  if (bullets.length === 0) {
+                    descriptionErrors.push(
+                      'Changes must have at least one real bullet point (not just "-")'
+                    );
+                  }
+                }
+
+                // Check 7: Squash commit message has content
+                const squashMatch = stripped.match(
+                  /##\s+Suggested Squash Commit Message\s*\n([\s\S]*?)(?=\n##|$)/
+                );
+                if (squashMatch) {
+                  const hasCodeBlock = /```[\s\S]*?[^\s][\s\S]*?```/.test(
+                    squashMatch[1]
+                  );
+                  if (!hasCodeBlock) {
+                    descriptionErrors.push(
+                      'Suggested Squash Commit Message must contain a code block with content'
+                    );
+                  }
+                }
+              }
+            }
+
+            // --- Compose result ---
+            const hasGoldenViolations = goldenViolations.length > 0;
+            const hasDescriptionErrors = descriptionErrors.length > 0;
+            const failed = hasGoldenViolations || hasDescriptionErrors;
+
+            let comment;
+            if (failed) {
+              let sections = [];
+
+              if (hasDescriptionErrors) {
+                const items = descriptionErrors
+                  .map((e) => `- [ ] ${e}`)
+                  .join('\n');
+                sections.push(`**PR Description Issues:**\n${items}`);
+              }
+
+              if (hasGoldenViolations) {
+                const items = goldenViolations
+                  .split('\n')
+                  .filter((l) => l.trim())
+                  .map((v) => `- [ ] ${v}`)
+                  .join('\n');
+                sections.push(`**Golden Rule Violations:**\n${items}`);
+              }
+
+              comment = `### Hey Claude —\n\nPR validation failed. Fix these issues, commit, and push.\n\n${sections.join('\n\n')}`;
+            } else {
+              const descResult = descriptionSkipped
+                ? '⏭️ skipped (human PR)'
+                : '✅ passed';
+              comment = `### PR Validation Passed ✅\n\n| Check | Result |\n|---|---|\n| PR Description | ${descResult} |\n| Golden Rules | ✅ no violations |`;
+            }
+
+            core.setOutput('body', comment);
+            core.setOutput('failed', failed.toString());
+
+      - name: Post PR validation comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-validation
+          message: ${{ steps.validate.outputs.body }}
+
+      - name: Fail if validation failed
+        if: steps.validate.outputs.failed == 'true'
+        run: exit 1
+
+  change-reminders:
+    name: Change Reminders
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Analyze changes and compose reminders
+        id: analyze
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              per_page: 100,
+            });
+
+            const filenames = files.map((f) => f.filename);
+            const totalAdditions = files.reduce((sum, f) => sum + f.additions, 0);
+            const totalDeletions = files.reduce((sum, f) => sum + f.deletions, 0);
+            const totalChanged = totalAdditions + totalDeletions;
+            const fileCount = files.length;
+            const reminders = [];
+
+            // PR size guardrails
+            if (totalChanged > 500) {
+              reminders.push(
+                `📏 **Large PR detected:** ${totalChanged} lines changed across ${fileCount} files. Consider whether this should be split into smaller PRs. Large diffs are harder to review and more likely to contain scope creep.`
+              );
+            } else if (fileCount > 15) {
+              reminders.push(
+                `📏 **Many files touched:** ${fileCount} files changed. Is this one logical change, or should it be split?`
+              );
+            }
+
+            // Check for new dependencies in package.json
+            const pkgFile = files.find((f) => f.filename === 'package.json');
+            if (pkgFile && pkgFile.patch) {
+              const addedDepLines = pkgFile.patch
+                .split('\n')
+                .filter(
+                  (l) =>
+                    l.startsWith('+') &&
+                    !l.startsWith('+++') &&
+                    /"[@a-z].*":\s*"/.test(l)
+                );
+              if (addedDepLines.length > 0) {
+                reminders.push(
+                  '📝 **ADR trigger:** new dependency detected in `package.json`. Check CLAUDE.md → "ADR Triggers" — a new top-level dependency requires an ADR.'
+                );
+              }
+            }
+
+            // Check for vercel.ts changes
+            if (filenames.includes('vercel.ts')) {
+              reminders.push(
+                '👀 **Deployment config changed** — verify behavior on preview deployment before merging.'
+              );
+            }
+
+            // Check for tooling config changes
+            if (
+              filenames.includes('eslint.config.mjs') ||
+              filenames.includes('.prettierrc')
+            ) {
+              reminders.push(
+                '🔧 **Tooling config changed** — did you run `npm run format` on the whole repo?'
+              );
+            }
+
+            // Check for ADR changes
+            if (filenames.some((f) => f.startsWith('docs/adr/') && f !== 'docs/adr/README.md')) {
+              if (!filenames.includes('docs/adr/README.md')) {
+                reminders.push(
+                  '📚 **ADR modified** — did you update the ADR index in `docs/adr/README.md`?'
+                );
+              }
+            }
+
+            // Check for CI workflow changes
+            if (filenames.some((f) => f.startsWith('.github/workflows/'))) {
+              reminders.push(
+                '🏗️ **CI pipeline changed** — this is an ADR trigger per CLAUDE.md.'
+              );
+            }
+
+            // Check for agent contract changes
+            if (
+              filenames.includes('CLAUDE.md') ||
+              filenames.includes('AGENTS.md')
+            ) {
+              reminders.push(
+                '🤖 **Agent contract changed** — other agents pick up these changes immediately.'
+              );
+            }
+
+            const hasReminders = reminders.length > 0;
+
+            let comment = '';
+            if (hasReminders) {
+              comment = `### Change-Aware Reminders\n\nThese are advisory — not blocking merge.\n\n${reminders.map((r) => `- ${r}`).join('\n')}`;
+            }
+
+            core.setOutput('has_reminders', hasReminders.toString());
+            core.setOutput('body', comment);
+
+      - name: Post change reminders
+        if: steps.analyze.outputs.has_reminders == 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: change-reminders
+          message: ${{ steps.analyze.outputs.body }}
+
+      - name: Clear reminders if none apply
+        if: steps.analyze.outputs.has_reminders != 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: change-reminders
+          delete: true
