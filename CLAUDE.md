@@ -11,16 +11,18 @@
 - **Formatting:** Prettier with prettier-plugin-tailwindcss
 - **Package manager:** npm (do not use yarn, pnpm, or bun)
 - **Deployment:** Vercel (Fluid Compute, Node.js runtime)
+- **Testing:** Vitest with React Testing Library (unit + component tests)
 - **Config:** `vercel.ts` (typed, via @vercel/config)
 
 ## Pre-Push Checklist
 
-Run all four commands before pushing. All must exit 0:
+Run all five commands before pushing. All must exit 0:
 
 ```bash
 npm run lint
 npm run typecheck
 npm run format:check
+npm run test
 npm run build
 ```
 
@@ -32,6 +34,27 @@ npm run build
 4. **ADR required for architectural changes.** See "ADR Triggers" below.
 5. **Linear history on `main`.** Rebase-only workflow. See `docs/branch-protection.md`.
 6. **Prettier is enforced.** All code must pass `format:check`. Run `npm run format` to fix.
+
+## Testing
+
+Tests use **Vitest** with **React Testing Library**. Config: `vitest.config.mts`. Setup file: `src/test-setup.ts`.
+
+### Rules
+
+1. **Co-locate tests with source.** `src/lib/foo.ts` → `src/lib/foo.test.ts`. Agents see tests when reading source.
+2. **Test behavior, not implementation.** Assert what a function returns or what a component renders, not internal state or method calls.
+3. **No snapshot tests.** They create noisy diffs and break on any render change. Use explicit assertions.
+4. **Every module with logic gets a test.** Utilities, hooks, API route handlers, client components with interaction.
+5. **Don't test the framework.** Don't verify that Next.js routing works. Test YOUR code.
+6. **async Server Components → E2E only.** Vitest cannot test `async` Server Components. Use Playwright when needed (future).
+7. **Test the unhappy path.** Cover error cases, edge cases, empty states — not just the happy path.
+8. **No coverage thresholds.** Coverage % creates bad incentives. PR review assesses test quality.
+9. **Run `npm run test` (not `test:watch`) in CI and pre-push.** Watch mode is for local development only.
+
+### File Naming
+
+- Unit / component tests: `*.test.ts` or `*.test.tsx` (co-located next to source)
+- Test setup: `src/test-setup.ts` (global matchers, loaded automatically)
 
 ## Branch Workflow
 
@@ -45,7 +68,7 @@ See `docs/branch-protection.md` for the full ruleset and merge conflict runbook.
 
 The CI workflow posts three sticky comments on every PR:
 
-1. **CI Summary** — lint, typecheck, and build results.
+1. **CI Summary** — lint, typecheck, format, test, and build results.
 2. **PR Validation** — checks that agent PRs have properly filled-out reflection sections and no Golden Rule violations. Hard fail.
 3. **Change Reminders** — advisory notes about files you changed (e.g., "new dependency detected — ADR needed?", "large PR — consider splitting"). Not blocking.
 

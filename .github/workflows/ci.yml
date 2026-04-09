@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Lint, Typecheck, Build
+    name: Lint, Typecheck, Format, Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -36,6 +36,16 @@ jobs:
         run: npm run typecheck
         continue-on-error: true
 
+      - name: Format check
+        id: format
+        run: npm run format:check
+        continue-on-error: true
+
+      - name: Test
+        id: test
+        run: npm run test
+        continue-on-error: true
+
       - name: Build
         id: build
         run: npm run build
@@ -48,24 +58,30 @@ jobs:
           script: |
             const lint = '${{ steps.lint.outcome }}';
             const typecheck = '${{ steps.typecheck.outcome }}';
+            const format = '${{ steps.format.outcome }}';
+            const test = '${{ steps.test.outcome }}';
             const build = '${{ steps.build.outcome }}';
 
             const icon = (s) => s === 'success' ? '✅' : '❌';
             const rows = [
               `| Lint | ${icon(lint)} ${lint} |`,
               `| Typecheck | ${icon(typecheck)} ${typecheck} |`,
+              `| Format | ${icon(format)} ${format} |`,
+              `| Test | ${icon(test)} ${test} |`,
               `| Build | ${icon(build)} ${build} |`,
             ].join('\n');
 
             const table = `| Check | Result |\n|---|---|\n${rows}`;
 
-            const failed = [lint, typecheck, build].some(s => s !== 'success');
+            const failed = [lint, typecheck, format, test, build].some(s => s !== 'success');
 
             let body;
             if (failed) {
               const failures = [];
               if (lint !== 'success') failures.push('`npm run lint`');
               if (typecheck !== 'success') failures.push('`npm run typecheck`');
+              if (format !== 'success') failures.push('`npm run format:check`');
+              if (test !== 'success') failures.push('`npm run test`');
               if (build !== 'success') failures.push('`npm run build`');
               body = `### Hey Claude —\n\nThe following checks failed: ${failures.join(', ')}. Fix the issues, commit, and push.\n\n${table}`;
             } else {
@@ -412,6 +428,31 @@ jobs:
               reminders.push(
                 '🤖 **Agent contract changed** — other agents pick up these changes immediately.'
               );
+            }
+
+            // Check for new source files without corresponding test files
+            const newSourceFiles = files
+              .filter(
+                (f) =>
+                  f.status === 'added' &&
+                  f.filename.startsWith('src/') &&
+                  /\.(ts|tsx)$/.test(f.filename) &&
+                  !f.filename.endsWith('.test.ts') &&
+                  !f.filename.endsWith('.test.tsx') &&
+                  !f.filename.endsWith('.d.ts') &&
+                  !f.filename.includes('test-setup')
+              )
+              .map((f) => f.filename);
+            if (newSourceFiles.length > 0) {
+              const withoutTests = newSourceFiles.filter((f) => {
+                const testFile = f.replace(/\.(ts|tsx)$/, '.test.$1');
+                return !filenames.includes(testFile);
+              });
+              if (withoutTests.length > 0) {
+                reminders.push(
+                  `🧪 **New source files without tests:** ${withoutTests.map((f) => '`' + f + '`').join(', ')}. Consider adding co-located test files.`
+                );
+              }
             }
 
             const hasReminders = reminders.length > 0;

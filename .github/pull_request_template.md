@@ -94,6 +94,7 @@ None / [ADR-NNNN](docs/adr/NNNN-title.md)
 > - [ ] I ran `npm run lint` and it passed
 > - [ ] I ran `npm run typecheck` and it passed
 > - [ ] I ran `npm run format:check` and it passed
+> - [ ] I ran `npm run test` and it passed
 > - [ ] I ran `npm run build` and it passed
 > - [ ] I subscribed to PR activity after creating this PR
 > - [ ] I checked CLAUDE.md → "ADR Triggers" and either wrote an ADR or confirmed none is needed
