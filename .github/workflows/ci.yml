@@ -277,7 +277,8 @@ jobs:
                   const driftText = driftMatch[1].trim();
                   const hasTable = driftText.includes('| ADR') && /\|\s*\[?\d{4}\]?/.test(driftText);
                   const hasExplicitNone = /no drift risk/i.test(driftText);
-                  const isPlaceholder = driftText.includes('example.ts') || driftText.includes('Touchpoint Changed');
+                  // Only flag placeholder if the template's example file is still present
+                  const isPlaceholder = driftText.includes('example.ts');
                   if (!hasTable && !hasExplicitNone) {
                     descriptionErrors.push(
                       'Drift Risk must contain either an ADR touchpoint table or "No drift risk — no ADR touchpoints affected."'
