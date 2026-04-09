@@ -17,6 +17,7 @@ See `CLAUDE.md` → "ADR Triggers" for the full list. In short: any change that 
 
 ## Index
 
-| ADR                                                  | Title                              | Status   | Date       |
-| ---------------------------------------------------- | ---------------------------------- | -------- | ---------- |
-| [0001](./0001-initial-stack-and-agentic-workflow.md) | Initial Stack and Agentic Workflow | Accepted | 2026-04-09 |
+| ADR                                                  | Title                                       | Status   | Date       |
+| ---------------------------------------------------- | ------------------------------------------- | -------- | ---------- |
+| [0001](./0001-initial-stack-and-agentic-workflow.md) | Initial Stack and Agentic Workflow          | Accepted | 2026-04-09 |
+| [0002](./0002-intelligent-pr-validation.md)          | Intelligent PR Validation and Session Notes | Accepted | 2026-04-09 |

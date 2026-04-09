@@ -43,10 +43,14 @@ See `docs/branch-protection.md` for the full ruleset and merge conflict runbook.
 
 ## CI Feedback
 
-The CI workflow posts a sticky comment on every PR with lint, typecheck, and build results.
+The CI workflow posts three sticky comments on every PR:
 
-- **When the comment addresses "Hey Claude —"**, treat the failures listed as direct instructions to fix.
-- Fix the issues, commit, and push. The comment auto-updates on each push.
+1. **CI Summary** — lint, typecheck, and build results.
+2. **PR Validation** — checks that agent PRs have properly filled-out reflection sections and no Golden Rule violations. Hard fail.
+3. **Change Reminders** — advisory notes about files you changed (e.g., "new dependency detected — ADR needed?", "large PR — consider splitting"). Not blocking.
+
+- **When a comment addresses "Hey Claude —"**, treat the failures listed as direct instructions to fix.
+- Fix the issues, commit, and push. Comments auto-update on each push.
 
 ## Creating PRs
 
@@ -81,3 +85,11 @@ Write a new ADR in `docs/adr/` when any of these happen:
 - Modifying CI/CD pipeline behavior
 
 Use the template at `docs/adr/template.md`. Update the index at `docs/adr/README.md`.
+
+## Session Notes
+
+Session notes capture discoveries, dead ends, and codebase gotchas that don't fit in ADRs or code comments. They are the "lab notebook" of the repo.
+
+- **Before starting work**, check `.claude/sessions/` for notes related to your area.
+- **When creating a PR**, write a session note at `.claude/sessions/PR-<number>.md` if you discovered anything non-obvious. See `.claude/sessions/README.md` for the format.
+- Not every PR needs a session note. Skip it if you have nothing to report.
