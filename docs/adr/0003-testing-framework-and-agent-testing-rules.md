@@ -26,7 +26,7 @@ Next.js 16's official docs (`node_modules/next/dist/docs/01-app/02-guides/testin
 - **React Testing Library** (`@testing-library/react`) for component rendering and assertions.
 - **`@testing-library/jest-dom`** for DOM matchers (`toHaveTextContent`, `toBeVisible`, etc.) via Vitest integration.
 - **jsdom** as the test environment (simulates browser DOM).
-- **`vite-tsconfig-paths`** replaced by Vite's native `resolve.tsconfigPaths: true` (Vite now supports this natively).
+- **Path aliases** resolved via Vite's native `resolve.tsconfigPaths: true` (no `vite-tsconfig-paths` plugin needed).
 
 ### Test Location and Naming
 

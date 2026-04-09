@@ -38,7 +38,7 @@ This is a greenfield project deployed to Vercel. The repo needs to support auton
 ## Consequences
 
 - Agents get a clear contract and fast feedback loop.
-- Every PR runs lint, typecheck, and build automatically.
+- Every PR runs lint, typecheck, format check, test, and build automatically.
 - Formatting debates are eliminated — Prettier decides.
 - New architectural decisions require an ADR, which adds process overhead but prevents knowledge loss.
 
@@ -58,7 +58,7 @@ This is a greenfield project deployed to Vercel. The repo needs to support auton
 - [ ] `vercel.ts` exists at repo root and is the only Vercel config (no `vercel.json`)
 - [ ] No route, middleware, or function uses `runtime: 'edge'`
 - [ ] `main` branch has linear history (no merge commits)
-- [ ] All code passes `npm run lint`, `npm run typecheck`, `npm run format:check`
+- [ ] All code passes `npm run lint`, `npm run typecheck`, `npm run format:check`, `npm run test`
 - [ ] ADRs are required for architectural changes (see CLAUDE.md for triggers)
 - [ ] npm is the only package manager (no `yarn.lock`, `pnpm-lock.yaml`, or `bun.lock`)
 
@@ -68,7 +68,7 @@ This is a greenfield project deployed to Vercel. The repo needs to support auton
 - `CLAUDE.md` — project contract for agents
 - `eslint.config.mjs` — linting rules (includes eslint-config-prettier)
 - `.prettierrc` — formatting rules
-- `package.json` — scripts (lint, typecheck, format, format:check, build) and engines constraint
+- `package.json` — scripts (lint, typecheck, format, format:check, test, test:watch, build) and engines constraint
 - `.github/workflows/ci.yml` — CI pipeline (once created)
 - `.github/pull_request_template.md` — PR template with Agent Instructions (once created)
 - `docs/adr/` — architectural decision records
@@ -83,4 +83,5 @@ This is a greenfield project deployed to Vercel. The repo needs to support auton
 
 ### Related ADRs
 
-None — this is the first ADR.
+- [ADR-0002](./0002-intelligent-pr-validation.md) — extends CI with PR validation and change reminders
+- [ADR-0003](./0003-testing-framework-and-agent-testing-rules.md) — adds testing to CI and agent contract

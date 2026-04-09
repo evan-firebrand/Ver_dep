@@ -80,3 +80,4 @@ A `.claude/sessions/` directory for agents to capture discoveries, dead ends, an
 ### Related ADRs
 
 - [ADR-0001](./0001-initial-stack-and-agentic-workflow.md) — established the CI pipeline and PR template this ADR extends
+- [ADR-0003](./0003-testing-framework-and-agent-testing-rules.md) — adds missing-test-file reminder to the change-reminders job
