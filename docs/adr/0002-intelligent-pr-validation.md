@@ -28,6 +28,8 @@ Add two new jobs to the CI workflow, running in parallel with lint/typecheck/bui
    - Deployment/tooling config changes → verification reminders
    - CI pipeline or agent contract changes → ADR trigger reminder
    - PR size guardrails: warns if >500 lines changed or >15 files touched
+   - New source files without tests → co-location reminder (added by ADR-0003)
+   - ADR drift detection → flags when changed files match ADR touchpoints (added by ADR-0004)
 
 Each job posts its own sticky comment with a distinct header so comments don't overwrite each other.
 
@@ -80,3 +82,4 @@ A `.claude/sessions/` directory for agents to capture discoveries, dead ends, an
 ### Related ADRs
 
 - [ADR-0001](./0001-initial-stack-and-agentic-workflow.md) — established the CI pipeline and PR template this ADR extends
+- [ADR-0003](./0003-testing-framework-and-agent-testing-rules.md) — adds missing-test-file reminder to the change-reminders job

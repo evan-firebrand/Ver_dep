@@ -37,10 +37,10 @@ Checkable statements that future agents MUST NOT break. Write these as assertion
 
 ### Touchpoints
 
-File paths, symbols, or grep strings that implement this decision. Agents should check these files when evaluating whether the decision still holds:
+File paths that implement this decision. CI parses this section to detect drift — when a PR changes a file listed here, the change-reminders comment flags it. Use this exact format:
 
 - `path/to/file.ts` — description of relevance
-- `grep -r "pattern"` — what this search reveals
+- `path/to/directory/` — trailing slash for directory-level touchpoints
 
 ### Revisit Triggers
 
