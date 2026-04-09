@@ -97,4 +97,16 @@ None / [ADR-NNNN](docs/adr/NNNN-title.md)
 > - [ ] I ran `npm run build` and it passed
 > - [ ] I subscribed to PR activity after creating this PR
 > - [ ] I checked CLAUDE.md → "ADR Triggers" and either wrote an ADR or confirmed none is needed
+
+## Suggested Squash Commit Message
+
+> Write a commit message the repo owner can copy-paste when squash-merging.
+> Format: title line (under 72 chars) with PR number, blank line, bulleted body.
+>
+> ```
+> Short title here (#NN)
+>
+> - First change
+> - Second change
+> ```
 -->

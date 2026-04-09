@@ -58,8 +58,9 @@ When you create a PR:
 4. In **Deferred / Declined**: list anything you considered but chose not to do. "Nothing deferred" is valid but think first.
 5. In **Confidence**: pick a rating. If 🟡 or 🔴, you MUST list specific uncertain areas with file paths.
 6. Check **Session Hygiene** boxes only if you actually performed each step.
-7. After creating the PR, **subscribe to PR activity** so you receive review comments and CI results. You are responsible for responding to review comments on PRs you create. Do not create a PR and walk away.
-8. **Never merge your own PR.** Only the repo owner squashes and merges to `main`.
+7. In **Suggested Squash Commit Message**: write a copy-pasteable commit message for the repo owner. Title line under 72 chars with PR number, blank line, bulleted body summarizing the changes.
+8. After creating the PR, **subscribe to PR activity** so you receive review comments and CI results. You are responsible for responding to review comments on PRs you create. Do not create a PR and walk away.
+9. **Never merge your own PR.** Only the repo owner squashes and merges to `main`.
 
 ## PR Takeover
 
