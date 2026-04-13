@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
@@ -28,11 +29,21 @@ export async function generateMetadata({
   return { title: 'Venue' };
 }
 
-export default async function VenueDetailPage({
+export default function VenueDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  return (
+    <main className="mx-auto w-full max-w-3xl px-4 py-10">
+      <Suspense fallback={<p className="text-zinc-400">Loading venue…</p>}>
+        <VenueContent params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function VenueContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   let venues: Venue[] = [];
@@ -56,7 +67,7 @@ export default async function VenueDetailPage({
     });
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-10">
+    <>
       <Link
         href="/venues"
         className="mb-6 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-300"
@@ -129,6 +140,6 @@ export default async function VenueDetailPage({
           </section>
         )}
       </article>
-    </main>
+    </>
   );
 }

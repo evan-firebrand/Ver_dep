@@ -25,3 +25,4 @@ See `CLAUDE.md` → "ADR Triggers" for the full list. In short: any change that 
 | [0004](./0004-drift-detection-across-interlinked-documents.md) | Drift Detection Across Interlinked Documents | Accepted | 2026-04-09 |
 | [0005](./0005-claude-code-github-action.md)                    | Claude Code GitHub Action                    | Accepted | 2026-04-10 |
 | [0006](./0006-notion-read-only-data-layer.md)                  | Notion as Read-Only Data Layer               | Accepted | 2026-04-13 |
+| [0007](./0007-use-cache-for-notion-queries.md)                 | Use Cache Directive for Notion Query Caching | Accepted | 2026-04-13 |

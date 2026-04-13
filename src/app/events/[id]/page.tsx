@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { ActBadge } from '@/components/ActBadge';
@@ -30,11 +31,21 @@ export async function generateMetadata({
   return { title: 'Event' };
 }
 
-export default async function EventDetailPage({
+export default function EventDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  return (
+    <main className="mx-auto w-full max-w-3xl px-4 py-10">
+      <Suspense fallback={<p className="text-zinc-400">Loading event…</p>}>
+        <EventContent params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function EventContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   let events: NolaEvent[] = [];
@@ -67,7 +78,7 @@ export default async function EventDetailPage({
   const showStatus = event.status && event.status !== 'Active';
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-10">
+    <>
       <Link
         href="/events"
         className="mb-6 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-300"
@@ -181,6 +192,6 @@ export default async function EventDetailPage({
           </a>
         )}
       </article>
-    </main>
+    </>
   );
 }
