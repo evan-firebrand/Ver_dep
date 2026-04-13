@@ -1,5 +1,6 @@
 import { isFullPage } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { getNotionClient } from './client';
 import { DATABASE_IDS } from './constants';
@@ -49,16 +50,25 @@ async function collectAll<T>(
 
 /** Returns all events from the Events database. */
 export async function getEvents(): Promise<NolaEvent[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('notion-events');
   return collectAll(DATABASE_IDS.EVENTS, mapEvent);
 }
 
 /** Returns all venues from the Venues database. */
 export async function getVenues(): Promise<Venue[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('notion-venues');
   return collectAll(DATABASE_IDS.VENUES, mapVenue);
 }
 
 /** Returns all acts from the Acts database. */
 export async function getActs(): Promise<Act[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('notion-acts');
   return collectAll(DATABASE_IDS.ACTS, mapAct);
 }
 
@@ -68,10 +78,16 @@ export async function getActs(): Promise<Act[]> {
  * actively maintained.
  */
 export async function getOrganizations(): Promise<Organization[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('notion-organizations');
   return collectAll(DATABASE_IDS.ORGANIZATIONS, mapOrganization);
 }
 
 /** Returns all resources from the Resources database. */
 export async function getResources(): Promise<Resource[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('notion-resources');
   return collectAll(DATABASE_IDS.RESOURCES, mapResource);
 }

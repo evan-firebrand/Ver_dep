@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
+import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
@@ -22,7 +24,24 @@ function sortByDate(events: NolaEvent[]): NolaEvent[] {
   });
 }
 
-export default async function EventsPage() {
+export default function EventsPage() {
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-10">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-50">
+          Events
+        </h1>
+      </header>
+      <Suspense fallback={<p className="text-zinc-400">Loading events…</p>}>
+        <EventsList />
+      </Suspense>
+    </main>
+  );
+}
+
+async function EventsList() {
+  await connection();
+
   let events: NolaEvent[] = [];
   let venues: Venue[] = [];
 
@@ -35,35 +54,29 @@ export default async function EventsPage() {
   const venueById = new Map(venues.map((v) => [v.id, v]));
   const sorted = sortByDate(events);
 
-  return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-50">
-          Events
-        </h1>
-        <p className="mt-1 text-zinc-400">
-          {sorted.length > 0
-            ? `${sorted.length} event${sorted.length === 1 ? '' : 's'}`
-            : 'No events found.'}
-        </p>
-      </header>
+  if (sorted.length === 0) {
+    return (
+      <p className="text-zinc-500">
+        No events are available right now. Check back soon.
+      </p>
+    );
+  }
 
-      {sorted.length === 0 ? (
-        <p className="text-zinc-500">
-          No events are available right now. Check back soon.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map((event) => {
-            const venue = event.venueIds[0]
-              ? venueById.get(event.venueIds[0])
-              : undefined;
-            return (
-              <EventCard key={event.id} event={event} venueName={venue?.name} />
-            );
-          })}
-        </div>
-      )}
-    </main>
+  return (
+    <>
+      <p className="-mt-4 mb-8 text-zinc-400">
+        {sorted.length} event{sorted.length === 1 ? '' : 's'}
+      </p>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((event) => {
+          const venue = event.venueIds[0]
+            ? venueById.get(event.venueIds[0])
+            : undefined;
+          return (
+            <EventCard key={event.id} event={event} venueName={venue?.name} />
+          );
+        })}
+      </div>
+    </>
   );
 }

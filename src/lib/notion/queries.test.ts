@@ -20,6 +20,13 @@ vi.mock('./client', () => ({
   }),
 }));
 
+// cacheLife and cacheTag are Next.js server-only APIs; stub them in tests so
+// the 'use cache' directive in queries.ts doesn't throw in the jsdom environment.
+vi.mock('next/cache', () => ({
+  cacheLife: vi.fn(),
+  cacheTag: vi.fn(),
+}));
+
 /** Build a minimal PageObjectResponse with a title property. */
 function makeMinimalPage(id: string, title: string): PageObjectResponse {
   return {
