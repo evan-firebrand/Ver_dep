@@ -1,18 +1,30 @@
-import { expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { expect, test } from 'vitest';
+
 import Home from './page';
 
-test('Home page renders heading', () => {
+test('renders the site name in the heading', () => {
   render(<Home />);
-  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-    /edit the page\.tsx file/i,
-  );
+  expect(
+    screen.getByRole('heading', { level: 1, name: /NOLA Music Tracker/i }),
+  ).toBeDefined();
 });
 
-test('Home page renders navigation links', () => {
+test('renders Browse Events link pointing to /events', () => {
   render(<Home />);
-  const links = screen.getAllByRole('link');
-  const hrefs = links.map((link) => link.getAttribute('href'));
-  expect(hrefs.some((h) => h?.includes('vercel.com/new'))).toBe(true);
-  expect(hrefs.some((h) => h?.includes('nextjs.org/docs'))).toBe(true);
+  const link = screen.getByRole('link', { name: /Browse Events/i });
+  expect(link.getAttribute('href')).toBe('/events');
+});
+
+test('renders Browse Venues link pointing to /venues', () => {
+  render(<Home />);
+  const link = screen.getByRole('link', { name: /Browse Venues/i });
+  expect(link.getAttribute('href')).toBe('/venues');
+});
+
+test('lists the event types we track', () => {
+  render(<Home />);
+  expect(screen.getByText('Live Music')).toBeDefined();
+  expect(screen.getByText('Festivals')).toBeDefined();
+  expect(screen.getByText('Second Lines')).toBeDefined();
 });
