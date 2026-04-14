@@ -122,7 +122,7 @@ Session notes capture discoveries, dead ends, and codebase gotchas that don't fi
 
 `CODEBASE.md` is the quick-orientation file. It describes what exists (pages, components, data layer, utilities) so you don't need to scan the file tree.
 
-- **Read `CODEBASE.md` at session start** alongside this file. It tells you *what exists*; this file tells you *how to behave*.
+- **Read `CODEBASE.md` at session start** alongside this file. It tells you _what exists_; this file tells you _how to behave_.
 - **When creating a PR that adds, removes, or moves source files**, update `CODEBASE.md` to reflect the change. This is how the next session avoids a 5-minute exploration phase.
 - **Deferred items in session notes are context, not your task.** Your task comes from the current prompt. If a deferred item is a genuine prerequisite for your assigned work, ask the user before reprioritizing — do not silently switch tasks.
 - **Verify local is current with remote before starting.** Run `git fetch origin main` and check if local main is behind. Stale local state causes incorrect assumptions about what files exist.
