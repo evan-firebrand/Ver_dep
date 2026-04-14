@@ -47,8 +47,7 @@ async function EventsList() {
 
   try {
     [events, venues] = await Promise.all([fetchEvents(), fetchVenues()]);
-  } catch (err) {
-    console.error('[EventsList] Supabase fetch failed:', err);
+  } catch {
     // Supabase unavailable — render empty state
   }
 

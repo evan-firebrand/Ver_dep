@@ -26,8 +26,6 @@ export async function getEvents(): Promise<NolaEvent[]> {
     .from('events')
     .select('*, event_acts(act_id)');
 
-  console.log('[getEvents] data length:', data?.length, 'error:', error);
-
   if (error) throw error;
 
   return (data ?? []).map((row) => ({
