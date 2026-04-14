@@ -17,12 +17,13 @@ See `CLAUDE.md` → "ADR Triggers" for the full list. In short: any change that 
 
 ## Index
 
-| ADR                                                            | Title                                        | Status   | Date       |
-| -------------------------------------------------------------- | -------------------------------------------- | -------- | ---------- |
-| [0001](./0001-initial-stack-and-agentic-workflow.md)           | Initial Stack and Agentic Workflow           | Accepted | 2026-04-09 |
-| [0002](./0002-intelligent-pr-validation.md)                    | Intelligent PR Validation and Session Notes  | Accepted | 2026-04-09 |
-| [0003](./0003-testing-framework-and-agent-testing-rules.md)    | Testing Framework and Agent Testing Rules    | Accepted | 2026-04-09 |
-| [0004](./0004-drift-detection-across-interlinked-documents.md) | Drift Detection Across Interlinked Documents | Accepted | 2026-04-09 |
-| [0005](./0005-claude-code-github-action.md)                    | Claude Code GitHub Action                    | Accepted | 2026-04-10 |
-| [0006](./0006-notion-read-only-data-layer.md)                  | Notion as Read-Only Data Layer               | Accepted | 2026-04-13 |
-| [0007](./0007-use-cache-for-notion-queries.md)                 | Use Cache Directive for Notion Query Caching | Accepted | 2026-04-13 |
+| ADR                                                            | Title                                        | Status     | Date       |
+| -------------------------------------------------------------- | -------------------------------------------- | ---------- | ---------- |
+| [0001](./0001-initial-stack-and-agentic-workflow.md)           | Initial Stack and Agentic Workflow           | Accepted   | 2026-04-09 |
+| [0002](./0002-intelligent-pr-validation.md)                    | Intelligent PR Validation and Session Notes  | Accepted   | 2026-04-09 |
+| [0003](./0003-testing-framework-and-agent-testing-rules.md)    | Testing Framework and Agent Testing Rules    | Accepted   | 2026-04-09 |
+| [0004](./0004-drift-detection-across-interlinked-documents.md) | Drift Detection Across Interlinked Documents | Accepted   | 2026-04-09 |
+| [0005](./0005-claude-code-github-action.md)                    | Claude Code GitHub Action                    | Accepted   | 2026-04-10 |
+| [0006](./0006-notion-read-only-data-layer.md)                  | Notion as Read-Only Data Layer               | Superseded | 2026-04-13 |
+| [0007](./0007-use-cache-for-notion-queries.md)                 | Use Cache Directive for Query Caching        | Accepted   | 2026-04-13 |
+| [0008](./0008-supabase-read-only-data-layer.md)                | Supabase as Read-Only Data Layer             | Accepted   | 2026-04-14 |

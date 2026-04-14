@@ -5,8 +5,8 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { ActCard } from '@/components/ActCard';
-import { getActs, getEvents } from '@/lib/notion';
-import type { Act, Genre, NolaEvent } from '@/lib/notion';
+import { getActs, getEvents } from '@/lib/supabase';
+import type { Act, Genre, NolaEvent } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'Acts',
@@ -70,7 +70,7 @@ async function ActsList({
   try {
     [acts, events] = await Promise.all([fetchActs(), fetchEvents()]);
   } catch {
-    // Notion unavailable — render empty state
+    // Supabase unavailable — render empty state
   }
 
   const eventCountByAct = new Map<string, number>();

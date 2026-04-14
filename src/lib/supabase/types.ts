@@ -27,22 +27,21 @@ export interface EventDate {
 
 export interface NolaEvent {
   id: string;
-  url: string;
-  createdTime: string;
   name: string;
   eventType: EventType | null;
   date: EventDate | null;
   time: string | null;
   cost: string | null;
-  venueIds: string[];
+  /** Single venue foreign key (stringified integer). */
+  venueId: string | null;
   link: string | null;
   notes: string | null;
   interested: boolean;
   series: EventSeries[];
   status: EventStatus | null;
   entryMethod: EntryMethod | null;
+  /** Act IDs from the event_acts junction table (stringified integers). */
   actIds: string[];
-  sourceIds: string[];
 }
 
 // ─── Venues ──────────────────────────────────────────────────────────────────
@@ -70,8 +69,6 @@ export type Neighborhood =
 
 export interface Venue {
   id: string;
-  url: string;
-  createdTime: string;
   name: string;
   venueType: VenueType | null;
   neighborhood: Neighborhood | null;
@@ -112,60 +109,9 @@ export type Genre =
 
 export interface Act {
   id: string;
-  url: string;
-  createdTime: string;
   name: string;
   actType: ActType | null;
   genres: Genre[];
   notes: string | null;
   website: string | null;
-}
-
-// ─── Organizations (suspended 2026-04-10) ────────────────────────────────────
-
-export type OrganizationType =
-  | 'SA&PC (Social Aid & Pleasure Club)'
-  | 'Mardi Gras Krewe'
-  | 'Festival Organizer'
-  | 'Promoter / Presenter'
-  | 'Mardi Gras Indian Tribe'
-  | 'Radio / Media'
-  | 'Community Org';
-
-export interface Organization {
-  id: string;
-  url: string;
-  createdTime: string;
-  name: string;
-  type: OrganizationType | null;
-  website: string | null;
-  notes: string | null;
-}
-
-// ─── Resources ───────────────────────────────────────────────────────────────
-
-export type CheckFrequency =
-  | 'Daily'
-  | 'Weekly'
-  | 'Monthly'
-  | 'Seasonally'
-  | 'As Needed';
-
-export type ResourceCoverage =
-  | 'Festivals'
-  | 'Weekly Live Music'
-  | 'Concerts & Touring'
-  | 'Second Lines'
-  | 'Community Events'
-  | 'Mardi Gras / Parades';
-
-export interface Resource {
-  id: string;
-  url: string;
-  createdTime: string;
-  name: string;
-  resourceUrl: string | null;
-  checkFrequency: CheckFrequency | null;
-  coverage: ResourceCoverage[];
-  notes: string | null;
 }

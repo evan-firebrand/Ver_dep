@@ -6,8 +6,8 @@ import { cache } from 'react';
 
 import { ActBadge } from '@/components/ActBadge';
 import { formatEventDate } from '@/lib/format-date';
-import { getActs, getEvents, getVenues } from '@/lib/notion';
-import type { Act, NolaEvent, Venue } from '@/lib/notion';
+import { getActs, getEvents, getVenues } from '@/lib/supabase';
+import type { Act, NolaEvent, Venue } from '@/lib/supabase';
 
 const fetchEvents = cache(getEvents);
 const fetchVenues = cache(getVenues);
@@ -59,7 +59,7 @@ async function EventContent({ params }: { params: Promise<{ id: string }> }) {
       fetchActs(),
     ]);
   } catch {
-    // Notion unavailable
+    // Supabase unavailable
   }
 
   const event = events.find((e) => e.id === id);
@@ -68,9 +68,9 @@ async function EventContent({ params }: { params: Promise<{ id: string }> }) {
   const venueById = new Map(venues.map((v) => [v.id, v]));
   const actById = new Map(acts.map((a) => [a.id, a]));
 
-  const eventVenues = event.venueIds
-    .map((vid) => venueById.get(vid))
-    .filter(Boolean) as Venue[];
+  const eventVenues = event.venueId
+    ? ([venueById.get(event.venueId)].filter(Boolean) as Venue[])
+    : [];
   const eventActs = event.actIds
     .map((aid) => actById.get(aid))
     .filter(Boolean) as Act[];

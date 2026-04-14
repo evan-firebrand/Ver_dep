@@ -1,15 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import type { Act } from '@/lib/notion';
+import type { Act } from '@/lib/supabase';
 
 import { ActCard } from './ActCard';
 
 function makeAct(overrides: Partial<Act> = {}): Act {
   return {
     id: 'act-1',
-    url: 'https://notion.so/act-1',
-    createdTime: '2026-04-01T00:00:00Z',
     name: 'Rebirth Brass Band',
     actType: 'Brass Band',
     genres: ['Jazz', 'Brass', 'Funk'],

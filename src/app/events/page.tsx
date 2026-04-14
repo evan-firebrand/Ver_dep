@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
-import { getEvents, getVenues } from '@/lib/notion';
-import type { NolaEvent, Venue } from '@/lib/notion';
+import { getEvents, getVenues } from '@/lib/supabase';
+import type { NolaEvent, Venue } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'Events',
@@ -48,7 +48,7 @@ async function EventsList() {
   try {
     [events, venues] = await Promise.all([fetchEvents(), fetchVenues()]);
   } catch {
-    // Notion unavailable — render empty state
+    // Supabase unavailable — render empty state
   }
 
   const venueById = new Map(venues.map((v) => [v.id, v]));
@@ -69,8 +69,8 @@ async function EventsList() {
       </p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map((event) => {
-          const venue = event.venueIds[0]
-            ? venueById.get(event.venueIds[0])
+          const venue = event.venueId
+            ? venueById.get(event.venueId)
             : undefined;
           return (
             <EventCard key={event.id} event={event} venueName={venue?.name} />

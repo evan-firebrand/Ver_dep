@@ -1,4 +1,4 @@
-import type { EventDate } from '@/lib/notion';
+import type { EventDate } from '@/lib/supabase';
 
 /**
  * Formats an EventDate for display. For date-only events, parses the date

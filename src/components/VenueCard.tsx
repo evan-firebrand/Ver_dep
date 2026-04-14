@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import type { Venue, VenueType } from '@/lib/notion';
+import type { Venue, VenueType } from '@/lib/supabase';
 
 interface Props {
   venue: Venue;

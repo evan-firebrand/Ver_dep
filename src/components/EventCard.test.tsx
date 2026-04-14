@@ -1,21 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import type { NolaEvent } from '@/lib/notion';
+import type { NolaEvent } from '@/lib/supabase';
 
 import { EventCard } from './EventCard';
 
 function makeEvent(overrides: Partial<NolaEvent> = {}): NolaEvent {
   return {
     id: 'evt-1',
-    url: 'https://notion.so/evt-1',
-    createdTime: '2026-04-01T00:00:00Z',
     name: 'Jazz Showcase',
     eventType: 'Live Music',
     date: { start: '2026-04-25', end: null, isDatetime: false },
     time: null,
     cost: null,
-    venueIds: [],
+    venueId: null,
     link: null,
     notes: null,
     interested: false,
@@ -23,7 +21,6 @@ function makeEvent(overrides: Partial<NolaEvent> = {}): NolaEvent {
     status: 'Active',
     entryMethod: null,
     actIds: [],
-    sourceIds: [],
     ...overrides,
   };
 }

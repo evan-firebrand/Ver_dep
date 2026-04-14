@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { VenueCard } from '@/components/VenueCard';
-import { getEvents, getVenues } from '@/lib/notion';
-import type { NolaEvent, Venue } from '@/lib/notion';
+import { getEvents, getVenues } from '@/lib/supabase';
+import type { NolaEvent, Venue } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'Venues',
@@ -39,14 +39,17 @@ async function VenuesList() {
   try {
     [venues, events] = await Promise.all([fetchVenues(), fetchEvents()]);
   } catch {
-    // Notion unavailable — render empty state
+    // Supabase unavailable — render empty state
   }
 
   // Count events per venue
   const eventCountByVenue = new Map<string, number>();
   for (const event of events) {
-    for (const vid of event.venueIds) {
-      eventCountByVenue.set(vid, (eventCountByVenue.get(vid) ?? 0) + 1);
+    if (event.venueId) {
+      eventCountByVenue.set(
+        event.venueId,
+        (eventCountByVenue.get(event.venueId) ?? 0) + 1,
+      );
     }
   }
 

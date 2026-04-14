@@ -6,9 +6,9 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
-import { getActs, getEvents, getVenues } from '@/lib/notion';
-import type { Act, NolaEvent, Venue } from '@/lib/notion';
-import { buildLookup } from '@/lib/notion/resolve-relations';
+import { getActs, getEvents, getVenues } from '@/lib/supabase';
+import type { Act, NolaEvent, Venue } from '@/lib/supabase';
+import { buildLookup } from '@/lib/supabase/resolve-relations';
 
 const fetchActs = cache(getActs);
 const fetchEvents = cache(getEvents);
@@ -60,7 +60,7 @@ async function ActContent({ params }: { params: Promise<{ id: string }> }) {
       fetchVenues(),
     ]);
   } catch {
-    // Notion unavailable
+    // Supabase unavailable
   }
 
   const act = acts.find((a) => a.id === id);
@@ -160,8 +160,8 @@ async function ActContent({ params }: { params: Promise<{ id: string }> }) {
           ) : (
             <div className="flex flex-col gap-3">
               {upcomingEvents.map((event) => {
-                const venueName = event.venueIds[0]
-                  ? venueById.get(event.venueIds[0])?.name
+                const venueName = event.venueId
+                  ? venueById.get(event.venueId)?.name
                   : undefined;
                 return (
                   <EventCard

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import type { Act, ActType } from '@/lib/notion';
+import type { Act, ActType } from '@/lib/supabase';
 
 interface Props {
   act: Act;
