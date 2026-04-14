@@ -6,6 +6,7 @@ export {
   getResources,
   getVenues,
 } from './queries';
+export { buildLookup, resolveIds } from './resolve-relations';
 export type {
   Act,
   ActType,

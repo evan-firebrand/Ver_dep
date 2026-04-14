@@ -18,6 +18,12 @@ export function Nav() {
             Events
           </Link>
           <Link
+            href="/acts"
+            className="text-zinc-300 transition-colors hover:text-amber-400"
+          >
+            Acts
+          </Link>
+          <Link
             href="/venues"
             className="text-zinc-300 transition-colors hover:text-amber-400"
           >
