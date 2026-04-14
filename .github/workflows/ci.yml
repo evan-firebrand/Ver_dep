@@ -479,6 +479,23 @@ jobs:
               }
             }
 
+            // Check if new source files were added but CODEBASE.md not updated
+            const hasNewSourceFiles = files.some(
+              (f) =>
+                f.status === 'added' &&
+                f.filename.startsWith('src/') &&
+                /\.(ts|tsx)$/.test(f.filename) &&
+                !f.filename.endsWith('.test.ts') &&
+                !f.filename.endsWith('.test.tsx') &&
+                !f.filename.endsWith('.d.ts')
+            );
+            const codebaseMapUpdated = filenames.includes('CODEBASE.md');
+            if (hasNewSourceFiles && !codebaseMapUpdated) {
+              reminders.push(
+                '🗺️ **CODEBASE.md not updated** — new source files were added. Update the codebase map so the next session skips the exploration phase.'
+              );
+            }
+
             // --- ADR Drift Detection ---
             // Parse touchpoints from all ADRs and flag when changed files
             // overlap. This catches file-level drift; semantic drift requires
