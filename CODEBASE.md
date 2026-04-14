@@ -109,5 +109,7 @@ Tests are co-located with source (`*.test.ts` / `*.test.tsx`). See CLAUDE.md for
 | `src/lib/supabase/queries.test.ts`           | Supabase query functions with mocked client                |
 | `src/lib/supabase/resolve-relations.test.ts` | buildLookup and resolveIds utilities                       |
 | `src/lib/series.test.ts`                     | slugToSeries, seriesToSlug, and ALL_SERIES round-trip      |
+| `src/app/series/page.test.tsx`               | Series index renders all 5 series cards with correct hrefs |
+| `src/app/series/[slug]/page.test.tsx`        | Series detail outer shell renders Suspense fallback        |
 
 Setup: `src/test-setup.ts` (loads `@testing-library/jest-dom/vitest` + `afterEach(cleanup)`).
