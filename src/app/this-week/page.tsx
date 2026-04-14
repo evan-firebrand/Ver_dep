@@ -1,41 +1,56 @@
-import { getEvents, getVenues } from '@/lib/notion';
+import type { Metadata } from 'next';
+import { connection } from 'next/server';
+import { Suspense } from 'react';
+
 import { filterThisWeek } from '@/lib/events/filters';
+import { getEvents, getVenues } from '@/lib/notion';
+import type { NolaEvent, Venue } from '@/lib/notion';
 import { ThisWeekView } from '@/components/this-week/ThisWeekView';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'This Week in NOLA',
   description: 'Events in New Orleans for the next 7 days.',
 };
 
-export default async function ThisWeekPage() {
-  // Determine today's date in the NOLA timezone (America/Chicago).
-  // en-CA locale produces YYYY-MM-DD format, which is what our filter utilities expect.
+export default function ThisWeekPage() {
+  return (
+    <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-50">
+          This Week in NOLA
+        </h1>
+        <p className="mt-2 text-zinc-400">
+          Events in New Orleans for the next 7 days.
+        </p>
+      </header>
+      <Suspense fallback={<p className="text-zinc-400">Loading events…</p>}>
+        <ThisWeekContent />
+      </Suspense>
+    </main>
+  );
+}
+
+async function ThisWeekContent() {
+  await connection();
+
+  // Determine today's date in NOLA timezone. en-CA locale produces YYYY-MM-DD.
   const todayStr = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Chicago',
   }).format(new Date());
 
-  const [allEvents, venues] = await Promise.all([getEvents(), getVenues()]);
+  let allEvents: NolaEvent[] = [];
+  let venues: Venue[] = [];
+
+  try {
+    [allEvents, venues] = await Promise.all([getEvents(), getVenues()]);
+  } catch {
+    // Notion unavailable — render empty state
+  }
+
   const weekEvents = filterThisWeek(allEvents, todayStr);
   const venueMap = Object.fromEntries(venues.map((v) => [v.id, v]));
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <header className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            This Week in NOLA
-          </h1>
-          <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-            Events in New Orleans for the next 7 days.
-          </p>
-        </header>
-
-        <ThisWeekView
-          events={weekEvents}
-          venueMap={venueMap}
-          today={todayStr}
-        />
-      </div>
-    </div>
+    <ThisWeekView events={weekEvents} venueMap={venueMap} today={todayStr} />
   );
 }
