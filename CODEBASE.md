@@ -19,6 +19,7 @@ NOLA Music Tracker -- a read-only event/venue/act listing site for New Orleans m
 
 | Route | File | Description |
 |---|---|---|
+| (layout) | `src/app/layout.tsx` | App shell — `<html>`/`<body>`, Nav, Geist fonts (local woff2), globals.css import |
 | `/` | `src/app/page.tsx` | Static hero landing page with links to events/venues |
 | `/events` | `src/app/events/page.tsx` | All events, sorted by date, grid of EventCards |
 | `/events/[id]` | `src/app/events/[id]/page.tsx` | Event detail -- date, venue link, performers (ActBadge), notes |
@@ -87,3 +88,22 @@ ADR files: `docs/adr/NNNN-*.md`. Template: `docs/adr/template.md`. Index: `docs/
 | `PR-14.md` | `searchParams` is a Promise, genre filter validation, search stub left as TODO, `resolveIds` unused, act detail shows only upcoming performances |
 
 Session notes directory: `.claude/sessions/`.
+
+## Tests
+
+Tests are co-located with source (`*.test.ts` / `*.test.tsx`). See CLAUDE.md for the 9 testing rules.
+
+| Test file | What it covers |
+|---|---|
+| `src/app/page.test.tsx` | Landing page renders heading and nav links |
+| `src/components/EventCard.test.tsx` | EventCard badges, date, cost, status, interested indicator |
+| `src/components/VenueCard.test.tsx` | VenueCard neighborhood, address, type badge, event count |
+| `src/components/ActCard.test.tsx` | ActCard genres, type badge, event count |
+| `src/components/ActBadge.test.tsx` | ActBadge pill rendering with name + genre |
+| `src/lib/format-date.test.ts` | Date formatting for date-only vs datetime |
+| `src/lib/events/filters.test.ts` | All filter functions, edge cases, empty states |
+| `src/lib/events/formatters.test.ts` | Date/time/cost formatting, NOLA timezone handling |
+| `src/lib/supabase/queries.test.ts` | Supabase query functions with mocked client |
+| `src/lib/supabase/resolve-relations.test.ts` | buildLookup and resolveIds utilities |
+
+Setup: `src/test-setup.ts` (loads `@testing-library/jest-dom/vitest` + `afterEach(cleanup)`).
