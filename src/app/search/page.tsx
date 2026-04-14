@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Search',
@@ -34,7 +36,24 @@ interface Props {
   searchParams: Promise<{ q?: string }>;
 }
 
-export default async function SearchPage({ searchParams }: Props) {
+export default function SearchPage({ searchParams }: Props) {
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-10">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-50">
+          Search
+        </h1>
+      </header>
+      <Suspense fallback={<p className="text-zinc-400">Loading…</p>}>
+        <SearchContent searchParams={searchParams} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function SearchContent({ searchParams }: Props) {
+  await connection();
+
   const { q } = await searchParams;
   const query = q?.trim() ?? '';
 
@@ -61,17 +80,13 @@ export default async function SearchPage({ searchParams }: Props) {
   // (requires a client component wrapper with useTransition).
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-50">
-          Search
-        </h1>
-        {query && (
-          <p className="mt-1 text-zinc-400">Results for &quot;{query}&quot;</p>
-        )}
-      </header>
-
+    <>
+      {query && (
+        <p className="-mt-4 mb-8 text-zinc-400">
+          Results for &quot;{query}&quot;
+        </p>
+      )}
       <p className="text-zinc-500">Search is coming soon.</p>
-    </main>
+    </>
   );
 }

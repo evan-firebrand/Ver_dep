@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
+import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
@@ -28,11 +30,23 @@ export async function generateMetadata({
   return { title: 'Act' };
 }
 
-export default async function ActDetailPage({
+export default function ActDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  return (
+    <main className="mx-auto w-full max-w-3xl px-4 py-10">
+      <Suspense fallback={<p className="text-zinc-400">Loading act…</p>}>
+        <ActContent params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function ActContent({ params }: { params: Promise<{ id: string }> }) {
+  await connection();
+
   const { id } = await params;
 
   let acts: Act[] = [];
@@ -66,7 +80,7 @@ export default async function ActDetailPage({
     });
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-10">
+    <>
       <Link
         href="/acts"
         className="mb-6 inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-300"
@@ -161,6 +175,6 @@ export default async function ActDetailPage({
           )}
         </section>
       </article>
-    </main>
+    </>
   );
 }
