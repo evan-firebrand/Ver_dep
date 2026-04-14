@@ -29,6 +29,12 @@ export function Nav() {
           >
             Venues
           </Link>
+          <Link
+            href="/series"
+            className="text-zinc-300 transition-colors hover:text-amber-400"
+          >
+            Series
+          </Link>
         </div>
       </div>
     </nav>
