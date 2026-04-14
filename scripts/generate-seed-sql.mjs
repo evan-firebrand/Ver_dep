@@ -197,9 +197,12 @@ const eventsRaw = parseCSV(
   readFileSync(join(root, 'data/csv/events.csv'), 'utf8'),
 );
 
-// Filter duplicates
+// Filter duplicates and empty names
 const events = eventsRaw.filter(
-  (e) => !e.EventName?.includes('DUPLICATE') && !e.EventName?.includes('🗑️'),
+  (e) =>
+    e.EventName?.trim() &&
+    !e.EventName.includes('DUPLICATE') &&
+    !e.EventName.includes('🗑️'),
 );
 
 console.log(
