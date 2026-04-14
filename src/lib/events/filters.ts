@@ -1,9 +1,4 @@
-import type {
-  EventType,
-  Neighborhood,
-  NolaEvent,
-  Venue,
-} from '@/lib/notion/types';
+import type { EventType, Neighborhood, NolaEvent, Venue } from '@/lib/supabase';
 
 export type CostFilter = 'all' | 'free' | 'paid';
 
@@ -111,8 +106,10 @@ export function filterByNeighborhood(
   venueMap: Record<string, Venue>,
 ): NolaEvent[] {
   if (!neighborhood) return events;
-  return events.filter((event) =>
-    event.venueIds.some((id) => venueMap[id]?.neighborhood === neighborhood),
+  return events.filter(
+    (event) =>
+      event.venueId !== null &&
+      venueMap[event.venueId]?.neighborhood === neighborhood,
   );
 }
 

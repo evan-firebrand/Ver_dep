@@ -1,15 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import type { Venue } from '@/lib/notion';
+import type { Venue } from '@/lib/supabase';
 
 import { VenueCard } from './VenueCard';
 
 function makeVenue(overrides: Partial<Venue> = {}): Venue {
   return {
     id: 'venue-1',
-    url: 'https://notion.so/venue-1',
-    createdTime: '2026-04-01T00:00:00Z',
     name: "Tipitina's",
     venueType: 'Bar / Club',
     neighborhood: 'Uptown',

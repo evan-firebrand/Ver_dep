@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { EventDate } from '@/lib/notion';
+import type { EventDate } from '@/lib/supabase';
 import { formatEventDate } from './format-date';
 
 function makeDate(

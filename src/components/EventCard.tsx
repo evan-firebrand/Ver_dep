@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { formatEventDate } from '@/lib/format-date';
-import type { EventStatus, EventType, NolaEvent } from '@/lib/notion';
+import type { EventStatus, EventType, NolaEvent } from '@/lib/supabase';
 
 interface Props {
   event: NolaEvent;

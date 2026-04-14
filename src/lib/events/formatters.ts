@@ -1,4 +1,4 @@
-import type { EventDate, NolaEvent } from '@/lib/notion/types';
+import type { EventDate, NolaEvent } from '@/lib/supabase';
 
 const NOLA_TZ = 'America/Chicago';
 

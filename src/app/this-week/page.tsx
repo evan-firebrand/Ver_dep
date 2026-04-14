@@ -3,8 +3,8 @@ import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { filterThisWeek } from '@/lib/events/filters';
-import { getEvents, getVenues } from '@/lib/notion';
-import type { NolaEvent, Venue } from '@/lib/notion';
+import { getEvents, getVenues } from '@/lib/supabase';
+import type { NolaEvent, Venue } from '@/lib/supabase';
 import { ThisWeekView } from '@/components/this-week/ThisWeekView';
 
 export const metadata: Metadata = {
@@ -44,7 +44,7 @@ async function ThisWeekContent() {
   try {
     [allEvents, venues] = await Promise.all([getEvents(), getVenues()]);
   } catch {
-    // Notion unavailable — render empty state
+    // Supabase unavailable — render empty state
   }
 
   const weekEvents = filterThisWeek(allEvents, todayStr);

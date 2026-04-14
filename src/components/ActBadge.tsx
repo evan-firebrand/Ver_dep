@@ -1,4 +1,4 @@
-import type { Genre } from '@/lib/notion';
+import type { Genre } from '@/lib/supabase';
 
 interface Props {
   name: string;

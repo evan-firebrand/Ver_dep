@@ -5,8 +5,8 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
-import { getEvents, getVenues } from '@/lib/notion';
-import type { NolaEvent, Venue } from '@/lib/notion';
+import { getEvents, getVenues } from '@/lib/supabase';
+import type { NolaEvent, Venue } from '@/lib/supabase';
 
 const fetchVenues = cache(getVenues);
 const fetchEvents = cache(getEvents);
@@ -52,14 +52,14 @@ async function VenueContent({ params }: { params: Promise<{ id: string }> }) {
   try {
     [venues, events] = await Promise.all([fetchVenues(), fetchEvents()]);
   } catch {
-    // Notion unavailable
+    // Supabase unavailable
   }
 
   const venue = venues.find((v) => v.id === id);
   if (!venue) notFound();
 
   const venueEvents = events
-    .filter((e) => e.venueIds.includes(id))
+    .filter((e) => e.venueId === id)
     .sort((a, b) => {
       if (!a.date) return 1;
       if (!b.date) return -1;

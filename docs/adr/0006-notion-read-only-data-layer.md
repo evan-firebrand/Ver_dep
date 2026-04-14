@@ -2,7 +2,11 @@
 
 ## Status
 
-Accepted
+Superseded
+
+## Superseded By
+
+[ADR-0008](./0008-supabase-read-only-data-layer.md) — 2026-04-14
 
 ## Date
 
