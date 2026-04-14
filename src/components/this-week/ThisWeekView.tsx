@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { applyFilters, DEFAULT_FILTERS } from '@/lib/events/filters';
 import type { EventFilters } from '@/lib/events/filters';
 import { toLocalDateString } from '@/lib/events/formatters';
-import type { NolaEvent, Venue } from '@/lib/notion/types';
+import type { NolaEvent, Venue } from '@/lib/supabase';
 
 import { EventCard } from './EventCard';
 import { FilterBar } from './FilterBar';

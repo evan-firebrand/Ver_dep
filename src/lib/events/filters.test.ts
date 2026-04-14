@@ -12,21 +12,19 @@ import {
   filterThisWeek,
   isFreeEvent,
 } from './filters';
-import type { NolaEvent, Venue } from '@/lib/notion/types';
+import type { NolaEvent, Venue } from '@/lib/supabase';
 
 // ─── Test fixtures ────────────────────────────────────────────────────────────
 
 function makeEvent(overrides: Partial<NolaEvent> = {}): NolaEvent {
   return {
     id: 'evt-1',
-    url: 'https://notion.so/evt-1',
-    createdTime: '2026-04-13T00:00:00.000Z',
     name: 'Test Event',
     eventType: null,
     date: { start: '2026-04-14', end: null, isDatetime: false },
     time: null,
     cost: null,
-    venueIds: [],
+    venueId: null,
     link: null,
     notes: null,
     interested: false,
@@ -34,7 +32,6 @@ function makeEvent(overrides: Partial<NolaEvent> = {}): NolaEvent {
     status: 'Active',
     entryMethod: null,
     actIds: [],
-    sourceIds: [],
     ...overrides,
   };
 }
@@ -45,8 +42,6 @@ function makeVenue(
 ): Venue {
   return {
     id,
-    url: `https://notion.so/${id}`,
-    createdTime: '2026-04-13T00:00:00.000Z',
     name: `Venue ${id}`,
     venueType: null,
     neighborhood,
@@ -278,35 +273,30 @@ describe('filterByNeighborhood', () => {
 
   it('returns all events when neighborhood is null', () => {
     const events = [
-      makeEvent({ venueIds: ['v-fq'] }),
-      makeEvent({ venueIds: ['v-mar'] }),
+      makeEvent({ venueId: 'v-fq' }),
+      makeEvent({ venueId: 'v-mar' }),
     ];
     expect(filterByNeighborhood(events, null, venueMap)).toHaveLength(2);
   });
 
   it('filters events to those with a venue in the given neighborhood', () => {
     const events = [
-      makeEvent({ id: 'fq', venueIds: ['v-fq'] }),
-      makeEvent({ id: 'mar', venueIds: ['v-mar'] }),
+      makeEvent({ id: 'fq', venueId: 'v-fq' }),
+      makeEvent({ id: 'mar', venueId: 'v-mar' }),
     ];
     const result = filterByNeighborhood(events, 'French Quarter', venueMap);
     expect(result.map((e) => e.id)).toEqual(['fq']);
   });
 
-  it('includes events where at least one venue matches', () => {
-    const event = makeEvent({ venueIds: ['v-fq', 'v-mar'] });
-    expect(filterByNeighborhood([event], 'Marigny', venueMap)).toHaveLength(1);
-  });
-
-  it('excludes events with no venues', () => {
-    const event = makeEvent({ venueIds: [] });
+  it('excludes events with no venue', () => {
+    const event = makeEvent({ venueId: null });
     expect(
       filterByNeighborhood([event], 'French Quarter', venueMap),
     ).toHaveLength(0);
   });
 
-  it('excludes events with venues not in the map', () => {
-    const event = makeEvent({ venueIds: ['v-unknown'] });
+  it('excludes events with a venue not in the map', () => {
+    const event = makeEvent({ venueId: 'v-unknown' });
     expect(
       filterByNeighborhood([event], 'French Quarter', venueMap),
     ).toHaveLength(0);
@@ -355,21 +345,21 @@ describe('applyFilters', () => {
         date: { start: '2026-04-14', end: null, isDatetime: false },
         cost: null,
         eventType: 'Live Music',
-        venueIds: ['v-fq'],
+        venueId: 'v-fq',
       }),
       makeEvent({
         id: 'wrong-date',
         date: { start: '2026-04-15', end: null, isDatetime: false },
         cost: null,
         eventType: 'Live Music',
-        venueIds: ['v-fq'],
+        venueId: 'v-fq',
       }),
       makeEvent({
         id: 'paid',
         date: { start: '2026-04-14', end: null, isDatetime: false },
         cost: '$20',
         eventType: 'Live Music',
-        venueIds: ['v-fq'],
+        venueId: 'v-fq',
       }),
     ];
     const filters: EventFilters = {

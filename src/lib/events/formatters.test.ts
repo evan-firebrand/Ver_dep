@@ -8,21 +8,19 @@ import {
   getThisWeekDays,
   toLocalDateString,
 } from './formatters';
-import type { NolaEvent } from '@/lib/notion/types';
+import type { NolaEvent } from '@/lib/supabase';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeEvent(overrides: Partial<NolaEvent> = {}): NolaEvent {
   return {
     id: 'evt-1',
-    url: 'https://notion.so/evt-1',
-    createdTime: '2026-04-13T00:00:00.000Z',
     name: 'Test Event',
     eventType: null,
     date: { start: '2026-04-14', end: null, isDatetime: false },
     time: null,
     cost: null,
-    venueIds: [],
+    venueId: null,
     link: null,
     notes: null,
     interested: false,
@@ -30,7 +28,6 @@ function makeEvent(overrides: Partial<NolaEvent> = {}): NolaEvent {
     status: 'Active',
     entryMethod: null,
     actIds: [],
-    sourceIds: [],
     ...overrides,
   };
 }

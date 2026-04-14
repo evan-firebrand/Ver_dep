@@ -1,6 +1,6 @@
 'use client';
 
-import type { EventType, Neighborhood } from '@/lib/notion/types';
+import type { EventType, Neighborhood } from '@/lib/supabase';
 import type { CostFilter, EventFilters } from '@/lib/events/filters';
 import {
   formatDayLabel,

@@ -1,4 +1,4 @@
-import type { NolaEvent, Venue } from '@/lib/notion/types';
+import type { NolaEvent, Venue } from '@/lib/supabase';
 import {
   formatCost,
   formatEventDate,
@@ -11,10 +11,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, venueMap }: EventCardProps) {
-  const venues = event.venueIds
-    .map((id) => venueMap[id])
-    .filter((v): v is Venue => v !== undefined);
-  const primaryVenue = venues[0] ?? null;
+  const primaryVenue = event.venueId ? (venueMap[event.venueId] ?? null) : null;
   const time = formatEventTime(event);
   const costLabel = formatCost(event.cost);
   const isCancelled = event.status === 'Cancelled';
