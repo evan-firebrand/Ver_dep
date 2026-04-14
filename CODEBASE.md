@@ -17,24 +17,26 @@ NOLA Music Tracker -- a read-only event/venue/act listing site for New Orleans m
 
 ## Pages
 
-| Route          | File                           | Description                                                                           |
-| -------------- | ------------------------------ | ------------------------------------------------------------------------------------- |
-| (layout)       | `src/app/layout.tsx`           | App shell — `<html>`/`<body>`, Nav, Geist fonts (local woff2), globals.css import     |
-| `/`            | `src/app/page.tsx`             | Static hero landing page with links to events/venues                                  |
-| `/events`      | `src/app/events/page.tsx`      | All events, sorted by date, grid of EventCards                                        |
-| `/events/[id]` | `src/app/events/[id]/page.tsx` | Event detail -- date, venue link, performers (ActBadge), notes                        |
-| `/acts`        | `src/app/acts/page.tsx`        | All acts, sorted alphabetically, server-side genre filter via `?genre=`               |
-| `/acts/[id]`   | `src/app/acts/[id]/page.tsx`   | Act detail -- genres, website, upcoming performances                                  |
-| `/venues`      | `src/app/venues/page.tsx`      | All venues, sorted alphabetically, with event counts                                  |
-| `/venues/[id]` | `src/app/venues/[id]/page.tsx` | Venue detail -- address, website, events at this venue                                |
-| `/this-week`   | `src/app/this-week/page.tsx`   | Events for next 7 days with client-side filters (day, cost, neighborhood, event type) |
-| `/search`      | `src/app/search/page.tsx`      | **Stub.** Types defined but logic is TODO. Not in nav.                                |
+| Route            | File                             | Description                                                                           |
+| ---------------- | -------------------------------- | ------------------------------------------------------------------------------------- |
+| (layout)         | `src/app/layout.tsx`             | App shell — `<html>`/`<body>`, Nav, Geist fonts (local woff2), globals.css import     |
+| `/`              | `src/app/page.tsx`               | Static hero landing page with links to events/venues                                  |
+| `/events`        | `src/app/events/page.tsx`        | All events, sorted by date, grid of EventCards                                        |
+| `/events/[id]`   | `src/app/events/[id]/page.tsx`   | Event detail -- date, venue link, performers (ActBadge), notes                        |
+| `/acts`          | `src/app/acts/page.tsx`          | All acts, sorted alphabetically, server-side genre filter via `?genre=`               |
+| `/acts/[id]`     | `src/app/acts/[id]/page.tsx`     | Act detail -- genres, website, upcoming performances                                  |
+| `/venues`        | `src/app/venues/page.tsx`        | All venues, sorted alphabetically, with event counts                                  |
+| `/venues/[id]`   | `src/app/venues/[id]/page.tsx`   | Venue detail -- address, website, events at this venue                                |
+| `/this-week`     | `src/app/this-week/page.tsx`     | Events for next 7 days with client-side filters (day, cost, neighborhood, event type) |
+| `/series`        | `src/app/series/page.tsx`        | Index of all event series — links to each series detail page                          |
+| `/series/[slug]` | `src/app/series/[slug]/page.tsx` | Events filtered by series (e.g. `jazz-fest-weekend-1`); 404 for unknown slugs         |
+| `/search`        | `src/app/search/page.tsx`        | **Stub.** Types defined but logic is TODO. Not in nav.                                |
 
 ## Components
 
 | Component               | File                                        | What it renders                                                                |
 | ----------------------- | ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `Nav`                   | `src/components/Nav.tsx`                    | Top nav bar -- links to Events, Acts, Venues                                   |
+| `Nav`                   | `src/components/Nav.tsx`                    | Top nav bar -- links to Events, Series, Acts, Venues                           |
 | `EventCard`             | `src/components/EventCard.tsx`              | Card link with event name, date, venue, type badge, cost, status               |
 | `VenueCard`             | `src/components/VenueCard.tsx`              | Card link with venue name, neighborhood, address, type badge, event count      |
 | `ActCard`               | `src/components/ActCard.tsx`                | Card link with act name, genres, type badge, event count                       |
@@ -52,6 +54,7 @@ NOLA Music Tracker -- a read-only event/venue/act listing site for New Orleans m
 | `events/formatters` | `src/lib/events/formatters.ts`          | `formatEventDate()` (NOLA tz), `formatEventTime()`, `formatCost()`, `getThisWeekDays()`, `toLocalDateString()`, `formatDayLabel()` |
 | `events/index`      | `src/lib/events/index.ts`               | Barrel re-export of filters + formatters                                                                                           |
 | `resolve-relations` | `src/lib/supabase/resolve-relations.ts` | `buildLookup()` (array to Map), `resolveIds()` (IDs to objects via Map)                                                            |
+| `series`            | `src/lib/series.ts`                     | `ALL_SERIES`, `slugToSeries()`, `seriesToSlug()` -- slug ↔ EventSeries mapping for `/series/[slug]` routes                         |
 
 ## Key Patterns
 
@@ -105,5 +108,6 @@ Tests are co-located with source (`*.test.ts` / `*.test.tsx`). See CLAUDE.md for
 | `src/lib/events/formatters.test.ts`          | Date/time/cost formatting, NOLA timezone handling          |
 | `src/lib/supabase/queries.test.ts`           | Supabase query functions with mocked client                |
 | `src/lib/supabase/resolve-relations.test.ts` | buildLookup and resolveIds utilities                       |
+| `src/lib/series.test.ts`                     | slugToSeries, seriesToSlug, and ALL_SERIES round-trip      |
 
 Setup: `src/test-setup.ts` (loads `@testing-library/jest-dom/vitest` + `afterEach(cleanup)`).
