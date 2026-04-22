@@ -40,7 +40,9 @@ export default function EventsPage({ searchParams }: PageProps) {
         </h1>
       </header>
       <div className="mb-8">
-        <FilterBarUrl />
+        <Suspense fallback={null}>
+          <FilterBarUrl />
+        </Suspense>
       </div>
       <Suspense fallback={<p className="text-zinc-400">Loading events…</p>}>
         <EventsList searchParams={searchParams} />
