@@ -11,6 +11,7 @@ import {
   todayInNolaTz,
 } from '@/lib/events/formatters';
 import { buildEventsHref } from '@/lib/events/search-params';
+import { weekendDaysInRange } from '@/lib/events/weekend';
 import { getEvents, getVenues } from '@/lib/supabase';
 import type { NolaEvent, Venue } from '@/lib/supabase';
 
@@ -116,16 +117,10 @@ async function UpcomingSections() {
   const todayEvents = filterByDate(events, todayStr);
   const tomorrowEvents = filterByDate(events, tomorrowStr);
 
-  // Starts at i=2 to skip today/tomorrow, which have their own sections above.
-  const weekendEvents: NolaEvent[] = [];
-  for (let i = 2; i <= 7; i++) {
-    const day = new Date(todayDate);
-    day.setDate(day.getDate() + i);
-    const dow = day.getDay();
-    if (dow === 6 || dow === 0) {
-      weekendEvents.push(...filterByDate(events, toLocalDateString(day)));
-    }
-  }
+  const weekendEvents: NolaEvent[] = weekendDaysInRange(todayDate, {
+    daysAhead: 7,
+    skipFromStart: 2,
+  }).flatMap((day) => filterByDate(events, toLocalDateString(day)));
 
   const sections: { title: string; events: NolaEvent[]; cta: QuickLink }[] = [
     {

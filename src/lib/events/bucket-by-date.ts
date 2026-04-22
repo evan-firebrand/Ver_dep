@@ -1,4 +1,5 @@
 import { addDays } from './formatters';
+import { isWeekend } from './weekend';
 import type { NolaEvent } from '@/lib/supabase';
 
 export type BucketKey =
@@ -73,8 +74,7 @@ function bucketForAnchor(anchor: string, today: string): BucketKey {
   const nextSunday = addDays(thisSunday, 7);
 
   if (anchor <= thisSunday) {
-    const anchorDow = dayOfWeek(anchor);
-    if (anchorDow === 6 || anchorDow === 0) return 'thisWeekend';
+    if (isWeekend(dayOfWeek(anchor))) return 'thisWeekend';
     return 'laterThisWeek';
   }
 
