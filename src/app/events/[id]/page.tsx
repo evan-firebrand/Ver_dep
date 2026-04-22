@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { ActBadge } from '@/components/ActBadge';
-import { formatEventDate } from '@/lib/format-date';
+import { formatEventDate } from '@/lib/events/formatters';
 import { getActs, getEvents, getVenues } from '@/lib/supabase';
 import type { Act, NolaEvent, Venue } from '@/lib/supabase';
 

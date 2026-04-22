@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { formatEventDate } from '@/lib/format-date';
+import { formatEventDate } from '@/lib/events/formatters';
 import type { EventStatus, EventType, NolaEvent } from '@/lib/supabase';
 
 interface Props {
