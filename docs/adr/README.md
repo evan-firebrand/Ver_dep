@@ -27,3 +27,4 @@ See `CLAUDE.md` → "ADR Triggers" for the full list. In short: any change that 
 | [0006](./0006-notion-read-only-data-layer.md)                  | Notion as Read-Only Data Layer               | Superseded | 2026-04-13 |
 | [0007](./0007-use-cache-for-notion-queries.md)                 | Use Cache Directive for Query Caching        | Accepted   | 2026-04-13 |
 | [0008](./0008-supabase-read-only-data-layer.md)                | Supabase as Read-Only Data Layer             | Accepted   | 2026-04-14 |
+| [0009](./0009-nav-suspense-island.md)                          | Nav Renders a Client Island Inside Suspense  | Accepted   | 2026-04-22 |

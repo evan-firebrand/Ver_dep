@@ -119,3 +119,4 @@ mode.
 
 - [ADR-0008](./0008-supabase-read-only-data-layer.md) — Supabase as read-only data layer; caching is listed as a required consequence
 - [ADR-0001](./0001-initial-stack-and-agentic-workflow.md) — stack (Next.js 16, Node.js runtime, Vercel Fluid Compute)
+- [ADR-0009](./0009-nav-suspense-island.md) — applies the Partial Prerender pattern to layout-level client islands
