@@ -529,7 +529,7 @@ jobs:
               // Skip non-path entries (commands like `npm run ...`, `grep ...`)
               const touchpoints = [];
               for (const line of tpMatch[1].split('\n')) {
-                const m = line.match(/^- `([^`]+)`/);
+                const m = line.match(/^[-*+] `([^`]+)`/);
                 if (
                   m &&
                   !m[1].startsWith('npm ') &&
