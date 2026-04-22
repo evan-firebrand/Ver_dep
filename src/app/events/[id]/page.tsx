@@ -166,7 +166,12 @@ async function EventContent({ params }: { params: Promise<{ id: string }> }) {
             </h2>
             <div className="flex flex-wrap gap-2">
               {eventActs.map((act) => (
-                <ActBadge key={act.id} name={act.name} genres={act.genres} />
+                <ActBadge
+                  key={act.id}
+                  id={act.id}
+                  name={act.name}
+                  genres={act.genres}
+                />
               ))}
             </div>
           </section>
