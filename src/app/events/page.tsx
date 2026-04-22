@@ -4,6 +4,11 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
+import { applyFilters } from '@/lib/events/filters';
+import {
+  parseEventFilters,
+  type RawSearchParams,
+} from '@/lib/events/search-params';
 import { getEvents, getVenues } from '@/lib/supabase';
 import type { NolaEvent, Venue } from '@/lib/supabase';
 
@@ -24,7 +29,11 @@ function sortByDate(events: NolaEvent[]): NolaEvent[] {
   });
 }
 
-export default function EventsPage() {
+interface PageProps {
+  searchParams: Promise<RawSearchParams>;
+}
+
+export default function EventsPage({ searchParams }: PageProps) {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-10">
       <header className="mb-8">
@@ -33,14 +42,17 @@ export default function EventsPage() {
         </h1>
       </header>
       <Suspense fallback={<p className="text-zinc-400">Loading events…</p>}>
-        <EventsList />
+        <EventsList searchParams={searchParams} />
       </Suspense>
     </main>
   );
 }
 
-async function EventsList() {
+async function EventsList({ searchParams }: PageProps) {
   await connection();
+
+  const raw = await searchParams;
+  const filters = parseEventFilters(raw);
 
   let events: NolaEvent[] = [];
   let venues: Venue[] = [];
@@ -52,12 +64,22 @@ async function EventsList() {
   }
 
   const venueById = new Map(venues.map((v) => [v.id, v]));
-  const sorted = sortByDate(events);
+  const venueMap = Object.fromEntries(venues.map((v) => [v.id, v]));
+  const filtered = applyFilters(events, filters, venueMap);
+  const sorted = sortByDate(filtered);
+
+  if (events.length === 0) {
+    return (
+      <p className="text-zinc-500">
+        No events are available right now. Check back soon.
+      </p>
+    );
+  }
 
   if (sorted.length === 0) {
     return (
       <p className="text-zinc-500">
-        No events are available right now. Check back soon.
+        No events match the current filters. Try removing some to see more.
       </p>
     );
   }
