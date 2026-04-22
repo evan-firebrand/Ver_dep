@@ -46,18 +46,40 @@ describe('EventCard', () => {
     );
   });
 
-  it('links to the event detail page', () => {
+  it('links the title to the event detail page', () => {
     render(<EventCard event={makeEvent({ id: 'abc-123' })} />);
-    expect(screen.getByRole('link').getAttribute('href')).toBe(
-      '/events/abc-123',
-    );
+    const titleLink = screen.getByRole('link', { name: 'Jazz Showcase' });
+    expect(titleLink.getAttribute('href')).toBe('/events/abc-123');
+  });
+
+  it('does not wrap the whole card in a link', () => {
+    render(<EventCard event={makeEvent()} />);
+    // Only one link expected (the title); adding a secondary external link
+    // in a separate test. If the card were whole-wrapped, we'd get 1+ extra.
+    expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
   it('renders the formatted date when present', () => {
     render(<EventCard event={makeEvent()} />);
-    const text = screen.getByRole('link').textContent ?? '';
-    expect(text).toContain('Apr');
-    expect(text).toContain('25');
+    expect(screen.getByText(/Apr/)).toBeDefined();
+    expect(screen.getByText(/25/)).toBeDefined();
+  });
+
+  it('renders a "More info" external link when event.link is set', () => {
+    render(
+      <EventCard
+        event={makeEvent({ link: 'https://example.com/show', id: 'x' })}
+      />,
+    );
+    const external = screen.getByRole('link', { name: /open .* website/i });
+    expect(external.getAttribute('href')).toBe('https://example.com/show');
+    expect(external.getAttribute('target')).toBe('_blank');
+    expect(external.getAttribute('rel')).toContain('noopener');
+  });
+
+  it('does not render an external link when event.link is null', () => {
+    render(<EventCard event={makeEvent({ link: null })} />);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
   it('renders a time when the event is a datetime', () => {

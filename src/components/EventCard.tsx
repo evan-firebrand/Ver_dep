@@ -39,17 +39,19 @@ export function EventCard({ event, venue }: Props) {
   const isCancelled = event.status === 'Cancelled';
 
   return (
-    <Link
-      href={`/events/${event.id}`}
-      className="flex flex-col gap-3 rounded-lg border border-zinc-700 bg-zinc-800 p-4 transition-colors hover:border-amber-500/60 hover:bg-zinc-800/80"
-    >
+    <article className="group flex flex-col gap-3 rounded-lg border border-zinc-700 bg-zinc-800 p-4 transition-colors hover:border-amber-500/60 hover:bg-zinc-800/80">
       <div className="flex items-start justify-between gap-2">
         <h3
           className={`text-base leading-snug font-semibold ${
             isCancelled ? 'text-zinc-400 line-through' : 'text-zinc-100'
           }`}
         >
-          {event.name || 'Untitled Event'}
+          <Link
+            href={`/events/${event.id}`}
+            className="transition-colors group-hover:text-amber-300"
+          >
+            {event.name || 'Untitled Event'}
+          </Link>
         </h3>
         <span className="shrink-0 text-sm font-medium text-zinc-300">
           {costStr}
@@ -87,7 +89,18 @@ export function EventCard({ event, venue }: Props) {
         {event.interested && (
           <span className="text-xs text-amber-400">★ Interested</span>
         )}
+        {event.link && (
+          <a
+            href={event.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto inline-flex items-center gap-1 text-xs text-zinc-400 transition-colors hover:text-amber-300"
+            aria-label={`Open ${event.name || 'event'} website in new tab`}
+          >
+            More info <span aria-hidden="true">↗</span>
+          </a>
+        )}
       </div>
-    </Link>
+    </article>
   );
 }
