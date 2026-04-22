@@ -5,6 +5,11 @@ import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
 import { FilterBarUrl } from '@/components/events/FilterBarUrl';
+import {
+  BUCKET_LABELS,
+  BUCKET_ORDER,
+  bucketByDate,
+} from '@/lib/events/bucket-by-date';
 import { applyFilters } from '@/lib/events/filters';
 import {
   parseEventFilters,
@@ -18,17 +23,8 @@ export const metadata: Metadata = {
   description: 'Live music, festivals, and events happening in New Orleans.',
 };
 
-// Memoize within this render so sibling components don't double-fetch
 const fetchEvents = cache(getEvents);
 const fetchVenues = cache(getVenues);
-
-function sortByDate(events: NolaEvent[]): NolaEvent[] {
-  return [...events].sort((a, b) => {
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    return a.date.start.localeCompare(b.date.start);
-  });
-}
 
 interface PageProps {
   searchParams: Promise<RawSearchParams>;
@@ -70,7 +66,6 @@ async function EventsList({ searchParams }: PageProps) {
   const venueById = new Map(venues.map((v) => [v.id, v]));
   const venueMap = Object.fromEntries(venues.map((v) => [v.id, v]));
   const filtered = applyFilters(events, filters, venueMap);
-  const sorted = sortByDate(filtered);
 
   if (events.length === 0) {
     return (
@@ -80,7 +75,7 @@ async function EventsList({ searchParams }: PageProps) {
     );
   }
 
-  if (sorted.length === 0) {
+  if (filtered.length === 0) {
     return (
       <p className="text-zinc-500">
         No events match the current filters. Try removing some to see more.
@@ -88,17 +83,43 @@ async function EventsList({ searchParams }: PageProps) {
     );
   }
 
+  const todayStr = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Chicago',
+  }).format(new Date());
+  const buckets = bucketByDate(filtered, todayStr);
+
+  const visibleCount = BUCKET_ORDER.reduce(
+    (sum, key) => sum + buckets[key].length,
+    0,
+  );
+
   return (
     <>
       <p className="-mt-4 mb-8 text-zinc-400">
-        {sorted.length} event{sorted.length === 1 ? '' : 's'}
+        {visibleCount} event{visibleCount === 1 ? '' : 's'}
       </p>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {sorted.map((event) => {
-          const venue = event.venueId
-            ? venueById.get(event.venueId)
-            : undefined;
-          return <EventCard key={event.id} event={event} venue={venue} />;
+      <div className="space-y-10">
+        {BUCKET_ORDER.map((key) => {
+          const bucket = buckets[key];
+          if (bucket.length === 0) return null;
+          return (
+            <section key={key}>
+              <h2 className="mb-4 text-sm font-semibold tracking-wider text-zinc-400 uppercase">
+                {BUCKET_LABELS[key]}
+                <span className="ml-2 text-zinc-600">({bucket.length})</span>
+              </h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {bucket.map((event) => {
+                  const venue = event.venueId
+                    ? venueById.get(event.venueId)
+                    : undefined;
+                  return (
+                    <EventCard key={event.id} event={event} venue={venue} />
+                  );
+                })}
+              </div>
+            </section>
+          );
         })}
       </div>
     </>
