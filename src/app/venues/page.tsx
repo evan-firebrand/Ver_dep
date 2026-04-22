@@ -4,8 +4,9 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { VenueCard } from '@/components/VenueCard';
+import { NEIGHBORHOODS } from '@/lib/events/search-params';
 import { getEvents, getVenues } from '@/lib/supabase';
-import type { NolaEvent, Venue } from '@/lib/supabase';
+import type { Neighborhood, NolaEvent, Venue } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'Venues',
@@ -14,6 +15,22 @@ export const metadata: Metadata = {
 
 const fetchVenues = cache(getVenues);
 const fetchEvents = cache(getEvents);
+
+const OTHER_LABEL = 'Other';
+
+function groupByNeighborhood(venues: Venue[]): Map<string, Venue[]> {
+  const groups = new Map<string, Venue[]>();
+  for (const venue of venues) {
+    const key = venue.neighborhood ?? OTHER_LABEL;
+    const list = groups.get(key) ?? [];
+    list.push(venue);
+    groups.set(key, list);
+  }
+  for (const list of groups.values()) {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return groups;
+}
 
 export default function VenuesPage() {
   return (
@@ -42,7 +59,6 @@ async function VenuesList() {
     // Supabase unavailable — render empty state
   }
 
-  // Count events per venue
   const eventCountByVenue = new Map<string, number>();
   for (const event of events) {
     if (event.venueId) {
@@ -53,9 +69,7 @@ async function VenuesList() {
     }
   }
 
-  const sorted = [...venues].sort((a, b) => a.name.localeCompare(b.name));
-
-  if (sorted.length === 0) {
+  if (venues.length === 0) {
     return (
       <p className="text-zinc-500">
         No venues are available right now. Check back soon.
@@ -63,19 +77,40 @@ async function VenuesList() {
     );
   }
 
+  const grouped = groupByNeighborhood(venues);
+  const orderedKeys: string[] = [
+    ...(NEIGHBORHOODS as readonly Neighborhood[]).filter((n) => grouped.has(n)),
+    ...(grouped.has(OTHER_LABEL) ? [OTHER_LABEL] : []),
+  ];
+
   return (
     <>
       <p className="-mt-4 mb-8 text-zinc-400">
-        {sorted.length} venue{sorted.length === 1 ? '' : 's'}
+        {venues.length} venue{venues.length === 1 ? '' : 's'} across{' '}
+        {orderedKeys.length} neighborhood
+        {orderedKeys.length === 1 ? '' : 's'}
       </p>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {sorted.map((venue) => (
-          <VenueCard
-            key={venue.id}
-            venue={venue}
-            eventCount={eventCountByVenue.get(venue.id)}
-          />
-        ))}
+      <div className="space-y-10">
+        {orderedKeys.map((key) => {
+          const list = grouped.get(key) ?? [];
+          return (
+            <section key={key}>
+              <h2 className="mb-4 text-sm font-semibold tracking-wider text-zinc-400 uppercase">
+                {key}
+                <span className="ml-2 text-zinc-600">({list.length})</span>
+              </h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {list.map((venue) => (
+                  <VenueCard
+                    key={venue.id}
+                    venue={venue}
+                    eventCount={eventCountByVenue.get(venue.id)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
     </>
   );

@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { ActBadge } from '@/components/ActBadge';
-import { formatEventDate } from '@/lib/format-date';
+import { formatEventDate } from '@/lib/events/formatters';
 import { getActs, getEvents, getVenues } from '@/lib/supabase';
 import type { Act, NolaEvent, Venue } from '@/lib/supabase';
 
@@ -166,7 +166,12 @@ async function EventContent({ params }: { params: Promise<{ id: string }> }) {
             </h2>
             <div className="flex flex-wrap gap-2">
               {eventActs.map((act) => (
-                <ActBadge key={act.id} name={act.name} genres={act.genres} />
+                <ActBadge
+                  key={act.id}
+                  id={act.id}
+                  name={act.name}
+                  genres={act.genres}
+                />
               ))}
             </div>
           </section>

@@ -9,6 +9,17 @@ describe('ActBadge', () => {
     expect(screen.getByText('Rebirth Brass Band')).toBeDefined();
   });
 
+  it('renders a link to /acts/[id] when an id is provided', () => {
+    render(<ActBadge id="act-99" name="Rebirth Brass Band" />);
+    const link = screen.getByRole('link', { name: /Rebirth Brass Band/ });
+    expect(link.getAttribute('href')).toBe('/acts/act-99');
+  });
+
+  it('renders as a static span when no id is provided', () => {
+    render(<ActBadge name="Rebirth Brass Band" />);
+    expect(screen.queryByRole('link')).toBeNull();
+  });
+
   it('renders the first genre when provided', () => {
     render(<ActBadge name="Trombone Shorty" genres={['Jazz', 'Funk']} />);
     expect(screen.getByText('Jazz')).toBeDefined();

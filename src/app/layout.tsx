@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 
+import { Footer } from '@/components/Footer';
 import { Nav } from '@/components/Nav';
 
 import './globals.css';
@@ -41,6 +42,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-zinc-900 text-zinc-100">
         <Nav />
         <div className="flex flex-1 flex-col">{children}</div>
+        <Footer />
       </body>
     </html>
   );

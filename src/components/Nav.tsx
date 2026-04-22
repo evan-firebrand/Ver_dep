@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
+
+import { NavLinks, NavLinksFallback } from './NavLinks';
 
 export function Nav() {
   return (
@@ -10,26 +13,9 @@ export function Nav() {
         >
           NOLA Music Tracker
         </Link>
-        <div className="flex items-center gap-6 text-sm font-medium">
-          <Link
-            href="/events"
-            className="text-zinc-300 transition-colors hover:text-amber-400"
-          >
-            Events
-          </Link>
-          <Link
-            href="/acts"
-            className="text-zinc-300 transition-colors hover:text-amber-400"
-          >
-            Acts
-          </Link>
-          <Link
-            href="/venues"
-            className="text-zinc-300 transition-colors hover:text-amber-400"
-          >
-            Venues
-          </Link>
-        </div>
+        <Suspense fallback={<NavLinksFallback />}>
+          <NavLinks />
+        </Suspense>
       </div>
     </nav>
   );
