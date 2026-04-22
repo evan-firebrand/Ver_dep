@@ -1,3 +1,4 @@
+import { addDays } from './formatters';
 import type { EventType, Neighborhood, NolaEvent, Venue } from '@/lib/supabase';
 
 export type CostFilter = 'all' | 'free' | 'paid';
@@ -20,12 +21,6 @@ export const DEFAULT_FILTERS: EventFilters = {
 
 function toDateStr(isoString: string): string {
   return isoString.slice(0, 10);
-}
-
-function addDays(dateStr: string, days: number): string {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const d = new Date(year, month - 1, day + days);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 /**

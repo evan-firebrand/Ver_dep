@@ -3,6 +3,7 @@ import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { filterThisWeek } from '@/lib/events/filters';
+import { todayInNolaTz } from '@/lib/events/formatters';
 import { getEvents, getVenues } from '@/lib/supabase';
 import type { NolaEvent, Venue } from '@/lib/supabase';
 import { ThisWeekView } from '@/components/this-week/ThisWeekView';
@@ -33,10 +34,7 @@ export default function ThisWeekPage() {
 async function ThisWeekContent() {
   await connection();
 
-  // Determine today's date in NOLA timezone. en-CA locale produces YYYY-MM-DD.
-  const todayStr = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Chicago',
-  }).format(new Date());
+  const todayStr = todayInNolaTz();
 
   let allEvents: NolaEvent[] = [];
   let venues: Venue[] = [];

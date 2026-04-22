@@ -4,7 +4,12 @@ import { cache, Suspense } from 'react';
 
 import { EventCard } from '@/components/EventCard';
 import { filterByDate } from '@/lib/events/filters';
-import { toLocalDateString } from '@/lib/events/formatters';
+import {
+  addDays,
+  parseLocalDate,
+  toLocalDateString,
+  todayInNolaTz,
+} from '@/lib/events/formatters';
 import { buildEventsHref } from '@/lib/events/search-params';
 import { getEvents, getVenues } from '@/lib/supabase';
 import type { NolaEvent, Venue } from '@/lib/supabase';
@@ -104,18 +109,14 @@ async function UpcomingSections() {
   }
 
   const venueById = new Map(venues.map((v) => [v.id, v]));
-  const todayStr = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Chicago',
-  }).format(new Date());
-  const [y, m, d] = todayStr.split('-').map(Number);
-  const todayDate = new Date(y, m - 1, d);
-  const tomorrowDate = new Date(y, m - 1, d + 1);
-  const tomorrowStr = toLocalDateString(tomorrowDate);
+  const todayStr = todayInNolaTz();
+  const todayDate = parseLocalDate(todayStr);
+  const tomorrowStr = addDays(todayStr, 1);
 
   const todayEvents = filterByDate(events, todayStr);
   const tomorrowEvents = filterByDate(events, tomorrowStr);
 
-  // Upcoming weekend: next Sat & Sun within 7 days, excluding today/tomorrow.
+  // Starts at i=2 to skip today/tomorrow, which have their own sections above.
   const weekendEvents: NolaEvent[] = [];
   for (let i = 2; i <= 7; i++) {
     const day = new Date(todayDate);

@@ -1,3 +1,4 @@
+import { addDays } from './formatters';
 import type { NolaEvent } from '@/lib/supabase';
 
 export type BucketKey =
@@ -38,12 +39,6 @@ export const BUCKET_LABELS: Record<BucketKey, string> = {
   later: 'Later',
   undated: 'Date TBD',
 };
-
-function addDays(dateStr: string, days: number): string {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const date = new Date(y, m - 1, d + days);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
 
 function dayOfWeek(dateStr: string): number {
   const [y, m, d] = dateStr.split('-').map(Number);
@@ -122,7 +117,9 @@ export function bucketByDate(events: NolaEvent[], today: string): EventBuckets {
   }
 
   for (const key of BUCKET_ORDER) {
-    buckets[key] = sortByStart(buckets[key]);
+    if (buckets[key].length > 1) {
+      buckets[key] = sortByStart(buckets[key]);
+    }
   }
 
   return buckets;
