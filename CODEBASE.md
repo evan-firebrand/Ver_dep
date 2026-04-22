@@ -28,7 +28,6 @@ NOLA Music Tracker -- a read-only event/venue/act listing site for New Orleans m
 | `/venues`      | `src/app/venues/page.tsx`      | All venues, sorted alphabetically, with event counts                                  |
 | `/venues/[id]` | `src/app/venues/[id]/page.tsx` | Venue detail -- address, website, events at this venue                                |
 | `/this-week`   | `src/app/this-week/page.tsx`   | Events for next 7 days with client-side filters (day, cost, neighborhood, event type) |
-| `/search`      | `src/app/search/page.tsx`      | **Stub.** Types defined but logic is TODO. Not in nav.                                |
 
 ## Components
 
