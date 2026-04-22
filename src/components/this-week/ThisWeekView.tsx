@@ -19,12 +19,11 @@ interface ThisWeekViewProps {
 }
 
 export function ThisWeekView({ events, venueMap, today }: ThisWeekViewProps) {
-  // Default to today's events rather than the 7-day firehose. Users who want
-  // the full week can click "All Days" in the FilterBar.
+  // Default to today rather than the full week so users see a focused list first;
+  // "All Days" in the FilterBar opens the full 7-day view.
   const initialFilters: EventFilters = { ...DEFAULT_FILTERS, date: today };
   const [filters, setFilters] = useState<EventFilters>(initialFilters);
 
-  // Parse today string to a local Date for the FilterBar day labels.
   const [year, month, day] = today.split('-').map(Number);
   const todayDate = new Date(year, month - 1, day);
 

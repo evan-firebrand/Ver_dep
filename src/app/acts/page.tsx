@@ -6,6 +6,7 @@ import { cache } from 'react';
 
 import { ActCard } from '@/components/ActCard';
 import { sortActsByNextShow } from '@/lib/acts/sort-by-next-show';
+import { todayInNolaTz } from '@/lib/events/formatters';
 import { getActs, getEvents } from '@/lib/supabase';
 import type { Act, Genre, NolaEvent } from '@/lib/supabase';
 
@@ -81,9 +82,7 @@ async function ActsList({
     }
   }
 
-  const todayStr = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Chicago',
-  }).format(new Date());
+  const todayStr = todayInNolaTz();
   const sorted = sortActsByNextShow(acts, events, todayStr);
   const filtered = activeGenre
     ? sorted.filter((act) => act.genres.includes(activeGenre))

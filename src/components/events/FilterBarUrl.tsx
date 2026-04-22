@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
 
 import type { CostFilter, EventFilters } from '@/lib/events/filters';
 import {
@@ -37,16 +36,15 @@ export function FilterBarUrl() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // URLSearchParams → our RawSearchParams shape.
   const raw = Object.fromEntries(searchParams.entries());
   const filters = parseEventFilters(raw);
+  const currentHref = buildEventsHref(filters);
 
-  const push = useCallback(
-    (next: EventFilters) => {
-      router.push(buildEventsHref(next));
-    },
-    [router],
-  );
+  const push = (next: EventFilters) => {
+    const nextHref = buildEventsHref(next);
+    if (nextHref === currentHref) return;
+    router.push(nextHref);
+  };
 
   const setCost = (cost: CostFilter) => push({ ...filters, cost });
 
@@ -62,14 +60,12 @@ export function FilterBarUrl() {
   };
 
   const clearAll = () =>
-    router.push(
-      buildEventsHref({
-        cost: 'all',
-        neighborhood: null,
-        eventTypes: [],
-        date: null,
-      }),
-    );
+    push({
+      cost: 'all',
+      neighborhood: null,
+      eventTypes: [],
+      date: null,
+    });
 
   return (
     <div className="space-y-3">

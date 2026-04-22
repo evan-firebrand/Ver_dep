@@ -16,6 +16,11 @@ const TIME_FORMATTER = new Intl.DateTimeFormat('en-US', {
   timeZone: NOLA_TZ,
 });
 
+// en-CA produces YYYY-MM-DD; combined with timeZone, this is stable across host envs.
+const NOLA_YMD_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+  timeZone: NOLA_TZ,
+});
+
 /**
  * Formats an EventDate's start date as a short human-readable string, e.g. "Mon, Apr 14".
  * Date-only values are anchored at noon UTC so the correct date is preserved when
@@ -74,6 +79,24 @@ export function toLocalDateString(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Returns today's date as YYYY-MM-DD in America/Chicago. Use this on the server
+ * so the day boundary follows NOLA time regardless of where the runtime lives.
+ */
+export function todayInNolaTz(now: Date = new Date()): string {
+  return NOLA_YMD_FORMATTER.format(now);
+}
+
+/**
+ * Adds `days` to a YYYY-MM-DD string and returns a YYYY-MM-DD string.
+ * Handles month/year roll-over via the Date constructor.
+ */
+export function addDays(dateStr: string, days: number): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const d = new Date(year, month - 1, day + days);
+  return toLocalDateString(d);
 }
 
 /**

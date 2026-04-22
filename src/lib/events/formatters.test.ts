@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  addDays,
   formatCost,
   formatDayLabel,
   formatEventDate,
   formatEventTime,
   getThisWeekDays,
+  todayInNolaTz,
   toLocalDateString,
 } from './formatters';
 import type { NolaEvent } from '@/lib/supabase';
@@ -169,6 +171,39 @@ describe('getThisWeekDays', () => {
     const ref = new Date(2026, 3, 28); // April 28
     const days = getThisWeekDays(ref);
     expect(toLocalDateString(days[6])).toBe('2026-05-04');
+  });
+});
+
+// ─── addDays ──────────────────────────────────────────────────────────────────
+
+describe('addDays', () => {
+  it('adds a positive number of days', () => {
+    expect(addDays('2026-04-14', 3)).toBe('2026-04-17');
+  });
+
+  it('handles month rollover', () => {
+    expect(addDays('2026-04-30', 1)).toBe('2026-05-01');
+  });
+
+  it('handles year rollover', () => {
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+  });
+
+  it('supports negative offsets', () => {
+    expect(addDays('2026-04-01', -1)).toBe('2026-03-31');
+  });
+});
+
+// ─── todayInNolaTz ────────────────────────────────────────────────────────────
+
+describe('todayInNolaTz', () => {
+  it('returns a YYYY-MM-DD string', () => {
+    expect(todayInNolaTz()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('reflects the Chicago date even when the instant is UTC midnight', () => {
+    // 2026-04-22T00:00:00Z is 2026-04-21 19:00 in America/Chicago (CDT).
+    expect(todayInNolaTz(new Date('2026-04-22T00:00:00Z'))).toBe('2026-04-21');
   });
 });
 

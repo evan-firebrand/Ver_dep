@@ -12,6 +12,7 @@ import {
   bucketByDate,
 } from '@/lib/events/bucket-by-date';
 import { applyFilters } from '@/lib/events/filters';
+import { todayInNolaTz } from '@/lib/events/formatters';
 import {
   parseEventFilters,
   type RawSearchParams,
@@ -66,7 +67,6 @@ async function EventsList({ searchParams }: PageProps) {
     // Supabase unavailable — render empty state
   }
 
-  const venueById = new Map(venues.map((v) => [v.id, v]));
   const venueMap = Object.fromEntries(venues.map((v) => [v.id, v]));
   const filtered = applyFilters(events, filters, venueMap);
 
@@ -105,9 +105,7 @@ async function EventsList({ searchParams }: PageProps) {
     );
   }
 
-  const todayStr = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Chicago',
-  }).format(new Date());
+  const todayStr = todayInNolaTz();
   const buckets = bucketByDate(filtered, todayStr);
 
   const visibleCount = BUCKET_ORDER.reduce(
@@ -133,7 +131,7 @@ async function EventsList({ searchParams }: PageProps) {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {bucket.map((event) => {
                   const venue = event.venueId
-                    ? venueById.get(event.venueId)
+                    ? venueMap[event.venueId]
                     : undefined;
                   return (
                     <EventCard key={event.id} event={event} venue={venue} />
