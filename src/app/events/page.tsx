@@ -72,9 +72,7 @@ async function EventsList() {
           const venue = event.venueId
             ? venueById.get(event.venueId)
             : undefined;
-          return (
-            <EventCard key={event.id} event={event} venueName={venue?.name} />
-          );
+          return <EventCard key={event.id} event={event} venue={venue} />;
         })}
       </div>
     </>

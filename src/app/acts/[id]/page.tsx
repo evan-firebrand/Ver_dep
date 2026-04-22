@@ -160,16 +160,10 @@ async function ActContent({ params }: { params: Promise<{ id: string }> }) {
           ) : (
             <div className="flex flex-col gap-3">
               {upcomingEvents.map((event) => {
-                const venueName = event.venueId
-                  ? venueById.get(event.venueId)?.name
+                const venue = event.venueId
+                  ? venueById.get(event.venueId)
                   : undefined;
-                return (
-                  <EventCard
-                    key={event.id}
-                    event={event}
-                    venueName={venueName}
-                  />
-                );
+                return <EventCard key={event.id} event={event} venue={venue} />;
               })}
             </div>
           )}

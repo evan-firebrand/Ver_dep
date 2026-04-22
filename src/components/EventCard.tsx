@@ -1,11 +1,19 @@
 import Link from 'next/link';
 
-import { formatEventDate } from '@/lib/events/formatters';
-import type { EventStatus, EventType, NolaEvent } from '@/lib/supabase';
+import {
+  formatCost,
+  formatEventDate,
+  formatEventTime,
+} from '@/lib/events/formatters';
+import type { EventStatus, EventType, NolaEvent, Venue } from '@/lib/supabase';
 
 interface Props {
   event: NolaEvent;
-  venueName?: string;
+  /**
+   * Pass the venue when you want the card to show venue name + neighborhood.
+   * On pages already scoped to a venue (e.g. /venues/[id]), pass undefined.
+   */
+  venue?: Venue | null;
 }
 
 const eventTypeColors: Record<EventType, string> = {
@@ -23,9 +31,12 @@ const statusColors: Record<EventStatus, string> = {
   'Sold Out': 'bg-sky-900/60 text-sky-300',
 };
 
-export function EventCard({ event, venueName }: Props) {
+export function EventCard({ event, venue }: Props) {
   const dateStr = event.date ? formatEventDate(event.date) : null;
+  const timeStr = formatEventTime(event);
+  const costStr = formatCost(event.cost);
   const showStatus = event.status && event.status !== 'Active';
+  const isCancelled = event.status === 'Cancelled';
 
   return (
     <Link
@@ -33,25 +44,28 @@ export function EventCard({ event, venueName }: Props) {
       className="flex flex-col gap-3 rounded-lg border border-zinc-700 bg-zinc-800 p-4 transition-colors hover:border-amber-500/60 hover:bg-zinc-800/80"
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-base leading-snug font-semibold text-zinc-100">
+        <h3
+          className={`text-base leading-snug font-semibold ${
+            isCancelled ? 'text-zinc-400 line-through' : 'text-zinc-100'
+          }`}
+        >
           {event.name || 'Untitled Event'}
         </h3>
-        {showStatus && event.status && (
-          <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[event.status]}`}
-          >
-            {event.status}
-          </span>
-        )}
+        <span className="shrink-0 text-sm font-medium text-zinc-300">
+          {costStr}
+        </span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-400">
         {dateStr && <span>{dateStr}</span>}
-        {venueName && (
-          <>
-            {dateStr && <span className="text-zinc-600">·</span>}
-            <span>{venueName}</span>
-          </>
+        {timeStr && <span>{timeStr}</span>}
+        {venue && (
+          <span>
+            {venue.name}
+            {venue.neighborhood && (
+              <span className="text-zinc-500"> · {venue.neighborhood}</span>
+            )}
+          </span>
         )}
       </div>
 
@@ -63,9 +77,11 @@ export function EventCard({ event, venueName }: Props) {
             {event.eventType}
           </span>
         )}
-        {event.cost && (
-          <span className="rounded-full bg-zinc-700 px-2 py-0.5 text-xs text-zinc-300">
-            {event.cost}
+        {showStatus && event.status && (
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[event.status]}`}
+          >
+            {event.status}
           </span>
         )}
         {event.interested && (

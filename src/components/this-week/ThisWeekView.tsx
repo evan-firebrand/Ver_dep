@@ -7,7 +7,8 @@ import type { EventFilters } from '@/lib/events/filters';
 import { toLocalDateString } from '@/lib/events/formatters';
 import type { NolaEvent, Venue } from '@/lib/supabase';
 
-import { EventCard } from './EventCard';
+import { EventCard } from '@/components/EventCard';
+
 import { FilterBar } from './FilterBar';
 
 interface ThisWeekViewProps {
@@ -54,9 +55,10 @@ export function ThisWeekView({ events, venueMap, today }: ThisWeekViewProps) {
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((event) => (
-            <EventCard key={event.id} event={event} venueMap={venueMap} />
-          ))}
+          {filtered.map((event) => {
+            const venue = event.venueId ? venueMap[event.venueId] : undefined;
+            return <EventCard key={event.id} event={event} venue={venue} />;
+          })}
         </div>
       )}
 
