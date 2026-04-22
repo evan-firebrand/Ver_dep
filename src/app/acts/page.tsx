@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { ActCard } from '@/components/ActCard';
+import { sortActsByNextShow } from '@/lib/acts/sort-by-next-show';
 import { getActs, getEvents } from '@/lib/supabase';
 import type { Act, Genre, NolaEvent } from '@/lib/supabase';
 
@@ -80,7 +81,10 @@ async function ActsList({
     }
   }
 
-  const sorted = [...acts].sort((a, b) => a.name.localeCompare(b.name));
+  const todayStr = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Chicago',
+  }).format(new Date());
+  const sorted = sortActsByNextShow(acts, events, todayStr);
   const filtered = activeGenre
     ? sorted.filter((act) => act.genres.includes(activeGenre))
     : sorted;
