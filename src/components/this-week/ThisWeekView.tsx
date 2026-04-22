@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { applyFilters, DEFAULT_FILTERS } from '@/lib/events/filters';
 import type { EventFilters } from '@/lib/events/filters';
-import { toLocalDateString } from '@/lib/events/formatters';
+import { parseLocalDate, toLocalDateString } from '@/lib/events/formatters';
 import type { NolaEvent, Venue } from '@/lib/supabase';
 
 import { EventCard } from '@/components/EventCard';
@@ -24,8 +24,7 @@ export function ThisWeekView({ events, venueMap, today }: ThisWeekViewProps) {
   const initialFilters: EventFilters = { ...DEFAULT_FILTERS, date: today };
   const [filters, setFilters] = useState<EventFilters>(initialFilters);
 
-  const [year, month, day] = today.split('-').map(Number);
-  const todayDate = new Date(year, month - 1, day);
+  const todayDate = parseLocalDate(today);
 
   const filtered = applyFilters(events, filters, venueMap);
   const count = filtered.length;

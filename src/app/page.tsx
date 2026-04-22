@@ -4,7 +4,12 @@ import { cache, Suspense } from 'react';
 
 import { EventCard } from '@/components/EventCard';
 import { filterByDate } from '@/lib/events/filters';
-import { toLocalDateString, todayInNolaTz } from '@/lib/events/formatters';
+import {
+  addDays,
+  parseLocalDate,
+  toLocalDateString,
+  todayInNolaTz,
+} from '@/lib/events/formatters';
 import { buildEventsHref } from '@/lib/events/search-params';
 import { getEvents, getVenues } from '@/lib/supabase';
 import type { NolaEvent, Venue } from '@/lib/supabase';
@@ -105,10 +110,8 @@ async function UpcomingSections() {
 
   const venueById = new Map(venues.map((v) => [v.id, v]));
   const todayStr = todayInNolaTz();
-  const [y, m, d] = todayStr.split('-').map(Number);
-  const todayDate = new Date(y, m - 1, d);
-  const tomorrowDate = new Date(y, m - 1, d + 1);
-  const tomorrowStr = toLocalDateString(tomorrowDate);
+  const todayDate = parseLocalDate(todayStr);
+  const tomorrowStr = addDays(todayStr, 1);
 
   const todayEvents = filterByDate(events, todayStr);
   const tomorrowEvents = filterByDate(events, tomorrowStr);

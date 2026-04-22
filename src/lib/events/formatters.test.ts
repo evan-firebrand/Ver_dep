@@ -7,6 +7,7 @@ import {
   formatEventDate,
   formatEventTime,
   getThisWeekDays,
+  parseLocalDate,
   todayInNolaTz,
   toLocalDateString,
 } from './formatters';
@@ -171,6 +172,22 @@ describe('getThisWeekDays', () => {
     const ref = new Date(2026, 3, 28); // April 28
     const days = getThisWeekDays(ref);
     expect(toLocalDateString(days[6])).toBe('2026-05-04');
+  });
+});
+
+// ─── parseLocalDate ───────────────────────────────────────────────────────────
+
+describe('parseLocalDate', () => {
+  it('round-trips with toLocalDateString', () => {
+    expect(toLocalDateString(parseLocalDate('2026-04-22'))).toBe('2026-04-22');
+  });
+
+  it('produces a local-midnight Date', () => {
+    const d = parseLocalDate('2026-04-22');
+    expect(d.getFullYear()).toBe(2026);
+    expect(d.getMonth()).toBe(3); // April
+    expect(d.getDate()).toBe(22);
+    expect(d.getHours()).toBe(0);
   });
 });
 

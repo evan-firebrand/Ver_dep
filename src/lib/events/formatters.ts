@@ -90,6 +90,15 @@ export function todayInNolaTz(now: Date = new Date()): string {
 }
 
 /**
+ * Parses a YYYY-MM-DD string into a local-time Date at midnight. Inverse of
+ * `toLocalDateString`.
+ */
+export function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/**
  * Adds `days` to a YYYY-MM-DD string and returns a YYYY-MM-DD string.
  * Handles month/year roll-over via the Date constructor.
  */
