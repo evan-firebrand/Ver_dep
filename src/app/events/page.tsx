@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { cache } from 'react';
 
 import { EventCard } from '@/components/EventCard';
+import { FilterBarUrl } from '@/components/events/FilterBarUrl';
 import { applyFilters } from '@/lib/events/filters';
 import {
   parseEventFilters,
@@ -36,11 +37,14 @@ interface PageProps {
 export default function EventsPage({ searchParams }: PageProps) {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="mb-8">
+      <header className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight text-zinc-50">
           Events
         </h1>
       </header>
+      <div className="mb-8">
+        <FilterBarUrl />
+      </div>
       <Suspense fallback={<p className="text-zinc-400">Loading events…</p>}>
         <EventsList searchParams={searchParams} />
       </Suspense>
