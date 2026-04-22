@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { cache } from 'react';
@@ -69,17 +70,36 @@ async function EventsList({ searchParams }: PageProps) {
 
   if (events.length === 0) {
     return (
-      <p className="text-zinc-500">
-        No events are available right now. Check back soon.
-      </p>
+      <div className="rounded-lg border border-dashed border-zinc-800 p-10 text-center">
+        <p className="text-zinc-500">
+          No events are available right now. Check back soon.
+        </p>
+        <Link
+          href="/venues"
+          className="mt-3 inline-block text-sm font-medium text-amber-400 hover:text-amber-300"
+        >
+          Browse venues instead →
+        </Link>
+      </div>
     );
   }
 
   if (filtered.length === 0) {
     return (
-      <p className="text-zinc-500">
-        No events match the current filters. Try removing some to see more.
-      </p>
+      <div className="rounded-lg border border-dashed border-zinc-800 p-10 text-center">
+        <p className="text-zinc-500">No events match the current filters.</p>
+        <div className="mt-3 flex flex-wrap justify-center gap-4 text-sm font-medium">
+          <Link href="/events" className="text-amber-400 hover:text-amber-300">
+            Clear filters
+          </Link>
+          <Link
+            href="/this-week"
+            className="text-amber-400 hover:text-amber-300"
+          >
+            See what&apos;s on this week
+          </Link>
+        </div>
+      </div>
     );
   }
 

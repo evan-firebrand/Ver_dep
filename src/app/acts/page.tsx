@@ -128,9 +128,17 @@ async function ActsList({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-zinc-500">
-          No acts found for genre &quot;{activeGenre}&quot;.
-        </p>
+        <div className="rounded-lg border border-dashed border-zinc-800 p-10 text-center">
+          <p className="text-zinc-500">
+            No acts found for genre &quot;{activeGenre}&quot;.
+          </p>
+          <Link
+            href="/acts"
+            className="mt-3 inline-block text-sm font-medium text-amber-400 hover:text-amber-300"
+          >
+            See all acts →
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((act) => (
