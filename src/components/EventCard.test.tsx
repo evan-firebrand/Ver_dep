@@ -53,10 +53,17 @@ describe('EventCard', () => {
   });
 
   it('does not wrap the whole card in a link', () => {
-    render(<EventCard event={makeEvent()} />);
-    // Only one link expected (the title); adding a secondary external link
-    // in a separate test. If the card were whole-wrapped, we'd get 1+ extra.
-    expect(screen.getAllByRole('link')).toHaveLength(1);
+    // Minimal event: just title link + event-type badge link (2 total).
+    // If the card were whole-wrapped, we'd also get the outer link.
+    render(
+      <EventCard event={makeEvent({ cost: '$15', eventType: 'Live Music' })} />,
+    );
+    const links = screen.getAllByRole('link');
+    // Title + event-type badge = 2 links
+    expect(links).toHaveLength(2);
+    expect(links.some((l) => l.getAttribute('href') === '/events/evt-1')).toBe(
+      true,
+    );
   });
 
   it('renders the formatted date when present', () => {
@@ -78,8 +85,38 @@ describe('EventCard', () => {
   });
 
   it('does not render an external link when event.link is null', () => {
-    render(<EventCard event={makeEvent({ link: null })} />);
+    // Date-only event, no cost, no type → just the title link.
+    render(
+      <EventCard
+        event={makeEvent({ link: null, eventType: null, cost: '$15' })}
+      />,
+    );
     expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
+
+  it('renders the event type badge as a filter link to /events?type=...', () => {
+    render(<EventCard event={makeEvent({ eventType: 'Festival' })} />);
+    const badge = screen.getByRole('link', { name: 'Festival' });
+    expect(badge.getAttribute('href')).toBe('/events?type=Festival');
+  });
+
+  it('renders the venue neighborhood as a filter link to /events?neighborhood=...', () => {
+    render(<EventCard event={makeEvent()} venue={makeVenue()} />);
+    const link = screen.getByRole('link', { name: 'Uptown' });
+    expect(link.getAttribute('href')).toBe('/events?neighborhood=Uptown');
+  });
+
+  it('renders "Free" as a filter link to /events?cost=free', () => {
+    render(<EventCard event={makeEvent({ cost: null })} />);
+    const link = screen.getByRole('link', { name: 'Free' });
+    expect(link.getAttribute('href')).toBe('/events?cost=free');
+  });
+
+  it('renders non-Free cost as a plain span (not a link)', () => {
+    render(<EventCard event={makeEvent({ cost: '$15' })} />);
+    // There's no link whose accessible name is "$15"
+    expect(screen.queryByRole('link', { name: '$15' })).toBeNull();
+    expect(screen.getByText('$15')).toBeDefined();
   });
 
   it('renders a time when the event is a datetime', () => {
