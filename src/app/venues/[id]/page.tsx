@@ -96,7 +96,18 @@ async function VenueContent({ params }: { params: Promise<{ id: string }> }) {
               <dt className="mb-0.5 text-xs font-semibold tracking-wider text-zinc-500 uppercase">
                 Address
               </dt>
-              <dd className="text-zinc-200">{venue.address}</dd>
+              <dd>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    `${venue.name}, ${venue.address}`,
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-zinc-200 hover:text-amber-300"
+                >
+                  {venue.address} <span aria-hidden="true">↗</span>
+                </a>
+              </dd>
             </div>
           )}
           {venue.website && (
