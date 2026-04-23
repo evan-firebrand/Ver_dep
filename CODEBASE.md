@@ -51,6 +51,7 @@ NOLA Music Tracker -- a read-only event/venue/act listing site for New Orleans m
 | `events/formatters`      | `src/lib/events/formatters.ts`          | `formatEventDate()` (NOLA tz), `formatEventTime()`, `formatCost()`, `getThisWeekDays()`, `toLocalDateString()`, `formatDayLabel()`         |
 | `events/search-params`   | `src/lib/events/search-params.ts`       | `parseEventFilters()`, `serializeEventFilters()`, `buildEventsHref()`; runtime `EVENT_TYPES` + `NEIGHBORHOODS` arrays                      |
 | `events/bucket-by-date`  | `src/lib/events/bucket-by-date.ts`      | `bucketByDate()` groups events into Today/Tomorrow/This Weekend/Later This Week/Next Week/Later/Undated                                    |
+| `events/weekend`         | `src/lib/events/weekend.ts`             | `isWeekend(dow)` predicate and `weekendDaysInRange(start, { daysAhead, skipFromStart })`; used by `page.tsx` and `bucket-by-date.ts`       |
 | `events/index`           | `src/lib/events/index.ts`               | Barrel re-export of filters + formatters                                                                                                   |
 | `acts/sort-by-next-show` | `src/lib/acts/sort-by-next-show.ts`     | `sortActsByNextShow()` orders acts by earliest upcoming event; no-upcoming acts fall to end alphabetically                                 |
 | `resolve-relations`      | `src/lib/supabase/resolve-relations.ts` | `buildLookup()` (array to Map), `resolveIds()` (IDs to objects via Map)                                                                    |
@@ -97,23 +98,24 @@ Session notes directory: `.claude/sessions/`.
 
 Tests are co-located with source (`*.test.ts` / `*.test.tsx`). See CLAUDE.md for the 9 testing rules.
 
-| Test file                                        | What it covers                                                                      |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `src/app/page.test.tsx`                          | Home shell: heading, CTAs, quick-pick URLs (async UpcomingSections not unit tested) |
-| `src/components/Nav.test.tsx`                    | Nav renders all links and marks active route via usePathname                        |
-| `src/components/Footer.test.tsx`                 | Footer description, data-freshness, submit-event link, source link                  |
-| `src/components/EventCard.test.tsx`              | Title-as-link, badge filter links, external-link icon, cost/date/time display       |
-| `src/components/VenueCard.test.tsx`              | VenueCard neighborhood, address, type badge, event count                            |
-| `src/components/ActCard.test.tsx`                | ActCard genres, type badge, event count                                             |
-| `src/components/ActBadge.test.tsx`               | ActBadge pill, id-driven Link vs static span                                        |
-| `src/components/this-week/ThisWeekView.test.tsx` | Defaults to today; "All Days" expands to full week                                  |
-| `src/components/events/FilterBarUrl.test.tsx`    | router.push URLs for cost/type toggles, clear-filters, aria-pressed state           |
-| `src/lib/events/filters.test.ts`                 | All filter functions, edge cases, empty states                                      |
-| `src/lib/events/formatters.test.ts`              | Date/time/cost formatting, NOLA timezone handling                                   |
-| `src/lib/events/search-params.test.ts`           | parseEventFilters, serializeEventFilters, buildEventsHref (round-trip, invalids)    |
-| `src/lib/events/bucket-by-date.test.ts`          | Today/Tomorrow/Weekend/Next Week bucketing, Fri/Sat/Sun edge cases, year rollover   |
-| `src/lib/acts/sort-by-next-show.test.ts`         | Ordering by next show, no-upcoming fallback, multi-day spanning today               |
-| `src/lib/supabase/queries.test.ts`               | Supabase query functions with mocked client                                         |
-| `src/lib/supabase/resolve-relations.test.ts`     | buildLookup and resolveIds utilities                                                |
+| Test file                                        | What it covers                                                                       |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `src/app/page.test.tsx`                          | Home shell: heading, CTAs, quick-pick URLs (async UpcomingSections not unit tested)  |
+| `src/components/Nav.test.tsx`                    | Nav renders all links and marks active route via usePathname                         |
+| `src/components/Footer.test.tsx`                 | Footer description, data-freshness, submit-event link, source link                   |
+| `src/components/EventCard.test.tsx`              | Title-as-link, badge filter links, external-link icon, cost/date/time display        |
+| `src/components/VenueCard.test.tsx`              | VenueCard neighborhood, address, type badge, event count                             |
+| `src/components/ActCard.test.tsx`                | ActCard genres, type badge, event count                                              |
+| `src/components/ActBadge.test.tsx`               | ActBadge pill, id-driven Link vs static span                                         |
+| `src/components/this-week/ThisWeekView.test.tsx` | Defaults to today; "All Days" expands to full week                                   |
+| `src/components/events/FilterBarUrl.test.tsx`    | router.push URLs for cost/type toggles, clear-filters, aria-pressed state            |
+| `src/lib/events/filters.test.ts`                 | All filter functions, edge cases, empty states                                       |
+| `src/lib/events/formatters.test.ts`              | Date/time/cost formatting, NOLA timezone handling                                    |
+| `src/lib/events/search-params.test.ts`           | parseEventFilters, serializeEventFilters, buildEventsHref (round-trip, invalids)     |
+| `src/lib/events/bucket-by-date.test.ts`          | Today/Tomorrow/Weekend/Next Week bucketing, Fri/Sat/Sun edge cases, year rollover    |
+| `src/lib/events/weekend.test.ts`                 | `isWeekend` predicate for all 7 days, `weekendDaysInRange` skip/window/year boundary |
+| `src/lib/acts/sort-by-next-show.test.ts`         | Ordering by next show, no-upcoming fallback, multi-day spanning today                |
+| `src/lib/supabase/queries.test.ts`               | Supabase query functions with mocked client                                          |
+| `src/lib/supabase/resolve-relations.test.ts`     | buildLookup and resolveIds utilities                                                 |
 
 Setup: `src/test-setup.ts` (loads `@testing-library/jest-dom/vitest` + `afterEach(cleanup)`).

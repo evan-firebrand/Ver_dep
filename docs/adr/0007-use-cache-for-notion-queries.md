@@ -47,6 +47,36 @@ The `React.cache()` wrappers at the page level are kept for intra-request dedupl
 - Tests that call the cached query functions must mock `next/cache` (`cacheLife`, `cacheTag`) because those are server-only APIs that throw in jsdom/Vitest environments.
 - On Vercel (serverless/Fluid Compute), in-memory runtime caches don't persist across cold starts. The 1-hour `cacheLife` applies to Vercel's Data Cache (persisted across instances) rather than local memory only.
 
+## Operational Risks
+
+### Empty-result cache persistence
+
+If a cached query throws or returns an empty result on its first
+invocation (e.g. transient Supabase outage, misconfigured key, empty
+database), the `use cache` directive persists that empty output for the
+full `cacheLife('hours')` window. Subsequent requests serve the empty
+array from cache instead of retrying the upstream call, so a brief
+upstream failure can surface as what appears to be "no data" for up to
+an hour after the upstream recovers.
+
+This was first encountered during PR #17 (Notion → Supabase migration)
+when a failed early run cached an empty result locally.
+
+**Local recovery:** `rm -rf .next && npm run dev`. Emptying the Next.js
+build cache clears the persisted `use cache` entries.
+
+**Production recovery:** call `revalidateTag('supabase-<entity>')` from a
+Server Action or admin route for the affected entity, or redeploy the
+Vercel function. Redeploy is the blunt instrument; tag revalidation is
+preferred once an admin surface exists.
+
+**Preferred guard when writing new `use cache` functions:** validate the
+upstream response before returning. Throwing on `response.error` (rather
+than falling back to `[]`) means a failure propagates to the caller and
+is never cached. Accept an empty upstream response only when empty is a
+legitimate business state (e.g. "no events scheduled"), not a failure
+mode.
+
 ## Alternatives Considered
 
 - **`unstable_cache` from `next/cache`**: Still functional in Next.js 16 but on a deprecation path. `use cache` is the stable, idiomatic v16 API. Rejected in favor of the stable path.
@@ -64,6 +94,7 @@ The `React.cache()` wrappers at the page level are kept for intra-request dedupl
 - [ ] No request-time APIs (`cookies()`, `headers()`, `searchParams`) are used inside any `use cache` function body
 - [ ] Tests that import from `src/lib/supabase/queries` mock `next/cache` (`cacheLife`, `cacheTag`)
 - [ ] Page components that fetch data use the Partial Prerender pattern: sync outer page → `<Suspense>` → async inner component with `await connection()` at the top
+- [ ] New `use cache` functions throw on upstream failure rather than returning `[]`, to avoid persisting empty-result caches (see Operational Risks)
 
 ### Touchpoints
 
@@ -88,3 +119,4 @@ The `React.cache()` wrappers at the page level are kept for intra-request dedupl
 
 - [ADR-0008](./0008-supabase-read-only-data-layer.md) — Supabase as read-only data layer; caching is listed as a required consequence
 - [ADR-0001](./0001-initial-stack-and-agentic-workflow.md) — stack (Next.js 16, Node.js runtime, Vercel Fluid Compute)
+- [ADR-0009](./0009-nav-suspense-island.md) — applies the Partial Prerender pattern to layout-level client islands
